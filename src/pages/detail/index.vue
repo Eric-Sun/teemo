@@ -1,0 +1,364 @@
+<template>
+  <div class='container'>
+    <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
+               :topicId='id' :replyId='replyId'></sendReply>
+    <div>
+      <div class='header'>
+        <div class='author'>
+          <img class='author-img' :src='detailData.userAvatarUrl' alt="头像">
+          <span class='name'>{{detailData.userName}}</span>
+        </div>
+        <div class='list'><img @click.stop="collect"
+                               :src="detailData.is_collect?'/static/star2.png':'/static/star1.png'"
+                               style='width:40rpx;height:40rpx;'><span>楼主</span></div>
+      </div>
+      <scroll-view class='body' scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
+                   @scrolltolower='getMore'>
+        <div class='title'>
+          <p class='big'>{{detailData.title}}</p>
+          <div class='time-info'>
+            <span>发布于:{{formatCreateAt}}</span>
+            <span>浏览:{{detailData.visit_count}}</span>
+            <span>评论:{{detailData.reply_count}}</span>
+          </div>
+        </div>
+        <img class='up-png' src="/static/up.png" mode='widthFix' @click.stop="goTop">
+        <div v-if='!sendVisible' class='reply-buton' @click.stop="showReplyModal">评论</div>
+        <div class='content'>
+          <textarea>{{detailData.content}}</textarea>
+        </div>
+        <div class='reply'>
+          <div>评论：</div>
+          <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
+            <div class='head'>
+              <img class='head-img' :src='item.userAvatarUrl'
+                   @click.stop='goAuthorPage'>
+              <div class='info'>
+                <span>{{item.userNamer}}</span>
+                <span class='time'>{{item.createtime}}</span>
+              </div>
+            </div>
+            <p class='reply-content'>
+              <textarea>{{item.content}}</textarea>
+            </p>
+            <div class='foot'>
+              <div :data-replyid='item.id' :data-originindex='originindex' @click.stop="upOrCancel($event)"><img
+                class='icon' :src="(!item.is_uped)?'/static/good1.png':'/static/good2.png'"/><span>点赞:</span>
+              </div>
+              <div  @click.stop="showReplyModal($event)" :data-replyid='item.id'>
+                <img class='icon' src='/static/chat.png'/><span>回复</span></div>
+            </div>
+          </div>
+        </div>
+      </scroll-view>
+    </div>
+  </div>
+</template>
+
+<script>
+  import { api } from '../../const'
+  import { passTime, debounce } from '../../utils'
+  import sendReply from '../../components/sendReply'
+
+  const debounceOnScroll = () => debounce(function (e) {
+    this.top = e.target.scrollTop
+  })
+  export default {
+    components: {
+      sendReply
+    },
+    mounted () {
+      this.getData()
+    },
+    computed: {
+      formatCreateAt () {
+        return passTime(this.detailData.createtime)
+      },
+      formatReplies () {
+        return this.currentReplies.map(_ => {
+          return {
+            ..._,
+            createtime: passTime(_.createtime)
+          }
+        })
+      }
+    },
+
+    methods: {
+      onScroll: debounceOnScroll(),
+      async getData () {
+        const accesstoken = wx.getStorageSync('accesstoken')
+        //this.id = wx.getStorageSync("topicid");
+        wx.showLoading({
+          title: '加载中'
+        })
+        const res = await this.$http.get(`${api}`, {
+          act: 'post.detail',
+          postId: this.id
+        })
+        wx.hideLoading()
+        console.log(res.data)
+        this.detailData = res.data
+        const res2 = await this.$http.get(`${api}`, {
+          act: 'reply.list',
+          pageNum: 0,
+          size: 10,
+          postId: 29
+        })
+        console.log(res2.data.data)
+        this.currentReplies = res2.data.data
+
+      },
+      async collect () {
+        const accesstoken = wx.getStorageSync('accesstoken')
+        const topic_id = this.id
+        if (this.detailData.is_collect) {
+          // /topic_collect/de_collect
+          const res = await this.$http.post(`${api}/topic_collect/de_collect`, {
+            accesstoken,
+            topic_id
+          })
+          if (res.data.success) {
+            wx.showToast({
+              title: '取消收藏成功',
+              icon: 'none',
+              duration: 2000
+            })
+            this.detailData.is_collect = false
+          }
+        } else {
+          //  /topic_collect/collect
+          const res = await this.$http.post(`${api}/topic_collect/collect`, {
+            accesstoken,
+            topic_id
+          })
+          if (res.data.success) {
+            wx.showToast({
+              title: '收藏成功',
+              icon: 'none',
+              duration: 2000
+            })
+          }
+          this.detailData.is_collect = true
+        }
+      },
+      goTop () {
+        // console.log(11);
+        this.top = 0
+      },
+      getMore () {
+        if (this.remainReplies.length > 0) {
+          this.currentReplies.concat(this.remainReplies.splice(0, 10))
+        } else {
+          wx.showToast({
+            title: '无更多数据',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      },
+      async upOrCancel (e) {
+        // / todo 防抖
+        // console.log(e);
+        const accesstoken = wx.getStorageSync('accesstoken')
+        if (accesstoken) {
+          try {
+            const res = await this.$http.post(
+              `${api}/reply/${e.currentTarget.dataset.replyid}/ups`,
+              {
+                accesstoken
+              }
+            )
+            if (res.data.success) {
+              wx.showToast({
+                title: '200',
+                icon: 'none',
+                duration: 2000
+              })
+              // e.currentTarget.dataset.originindex
+              if (res.data.action === 'up') {
+                this.currentReplies[e.currentTarget.dataset.originindex].ups.length += 1
+              } else {
+                this.currentReplies[e.currentTarget.dataset.originindex].ups.length -= 1
+              }
+
+              this.currentReplies[e.currentTarget.dataset.originindex].is_uped =
+                res.data.action === 'up'
+            }
+
+            // this.getData();
+          } catch (e) {
+            wx.showToast({
+              title: e.response.data.error_msg,
+              icon: 'none',
+              duration: 2000
+            })
+          }
+
+          //  originindex
+        } else {
+          wx.showToast({
+            title: '请先登录',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      },
+      showReplyModal (e) {
+        const replyname = e.currentTarget.dataset.loginname
+        if (replyname) {
+          this.content = `@${replyname} `
+        } else {
+          this.content = ''
+        }
+
+        this.replyId = e.currentTarget.dataset.replyid
+        this.sendVisible = true
+      },
+      replySuccess () {
+        wx.showToast({
+          title: '评论成功',
+          icon: 'none',
+          duration: 1500
+        })
+        this.closeModal()
+        this.getData()
+      },
+      closeModal () {
+        this.sendVisible = false
+      }
+    }
+    ,
+    onLoad () {
+      this.id = this.$root.$mp.query.postId
+      console.log('postId=' + this.id)
+    }
+    ,
+    data () {
+      return {
+        detailData: {},
+        remainReplies: [],
+        currentReplies: [],
+        content: '',
+        sendVisible: false,
+        id: '',
+        replyId: '',
+        top: 0,
+        timer: null
+      }
+    }
+  }
+</script>
+
+<style lang='scss' scoped>
+  .container {
+    height: 100vh;
+    background-color: rgb(245, 245, 239);
+    .header {
+      display: flex;
+      justify-content: space-between;
+      background-color: white;
+      margin-bottom: 20rpx;
+      padding: 30rpx;
+      .author {
+        color: $color;
+        display: flex;
+        align-items: center;
+        .author-img {
+          width: 64rpx;
+          height: 64rpx;
+        }
+        .name {
+          margin-left: 20rpx;
+        }
+      }
+      .list {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .body {
+      height: 90vh;
+    }
+    .title {
+      background-color: white;
+      margin-bottom: 20rpx;
+      padding: 30rpx;
+      .big {
+        font-size: 50rpx;
+      }
+      .time-info {
+        display: flex;
+        justify-content: space-around;
+      }
+    }
+    .reply-buton {
+      border-radius: 50%;
+      width: 100rpx;
+      height: 100rpx;
+      text-align: center;
+      font-size: 30rpx;
+      position: fixed;
+      line-height: 100rpx;
+      background-color: $color;
+      top: 86vh;
+      left: 81vw;
+      color: white;
+    }
+    .up-png {
+      width: 100rpx;
+      top: 75vh;
+      left: 81vw;
+      position: fixed;
+    }
+    .content {
+      background-color: white;
+      margin-bottom: 20rpx;
+      padding: 30rpx;
+    }
+  }
+
+  .reply {
+    background-color: white;
+    margin-bottom: 20rpx;
+    padding: 30rpx;
+    .reply-container {
+      padding: 30rpx;
+      .head {
+        color: $color;
+        display: flex;
+        align-items: center;
+        .head-img {
+          width: 64rpx;
+          height: 64rpx;
+        }
+        .info {
+          flex-direction: column;
+          display: flex;
+          margin-left: 26rpx;
+          .time {
+            color: $borderColor;
+          }
+        }
+      }
+      .reply-content {
+        font-size: 40rpx;
+        & + & {
+          border-top: 2rpx solid $borderColor;
+        }
+      }
+      .foot {
+        display: flex;
+        & > div {
+          margin-right: 20rpx;
+          display: flex;
+          align-items: center;
+        }
+        .icon {
+          width: 56rpx;
+          height: 56rpx;
+        }
+      }
+    }
+  }
+</style>
