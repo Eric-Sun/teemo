@@ -40,7 +40,7 @@
             </div>
             <p class='reply-content'>
               <textarea>{{item.content}}</textarea>
-            </p>
+            </p>post
             <div class='foot'>
               <div :data-replyid='item.id' :data-originindex='originindex' @click.stop="upOrCancel($event)"><img
                 class='icon' :src="(!item.is_uped)?'/static/good1.png':'/static/good2.png'"/><span>点赞:</span>
