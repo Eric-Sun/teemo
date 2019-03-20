@@ -1,11 +1,9 @@
 <template>
   <div class='container'>
     <div class='header'>
-      <div :class='{ active: tab==="all" }' @click.stop='changeTab($event)' data-tab='all' :data-offset='0'>全部</div>
-      <div :class='{ active: tab==="good" }' @click.stop='changeTab($event)' data-tab='good' :data-offset='1'>精华</div>
-      <div :class='{ active: tab==="share" }' @click.stop='changeTab($event)' data-tab='share' :data-offset='2'>分享</div>
-      <div :class='{ active: tab==="job" }' @click.stop='changeTab($event)' data-tab='job' :data-offset='3'>招聘</div>
-      <div :class='{ active: tab==="ask" }' @click.stop='changeTab($event)' data-tab='ask' :data-offset='4'>问答</div>
+      <div :class='{ active: tab==="story" }' @click.stop='changeTab($event)' data-tab='story' :data-offset='0'>故事贴</div>
+      <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记
+      </div>
     </div>
     <div class="containers" :animation='animation'>
       <div v-for='(listItem,listIndex) in list' :key='listIndex'>
@@ -21,21 +19,20 @@
 
 <script>
   import card from '@/components/card'
+  import { api, barId } from '../../const'
 
   export default {
     data () {
       return {
+        t: 0,
         page: 0,
-        tab: 'all',
+        tab: 'story',
         cardData: {
-          all: [],
-          good: [],
-          share: [],
-          job: [],
-          ask: []
+          story: [],
+          diary: []
         },
         isLoading: false,
-        list: ['all', 'good', 'share', 'job', 'ask'],
+        list: ['story', 'diary'],
         animation: {}
       }
     },
@@ -45,7 +42,8 @@
     },
 
     mounted () {
-      this.getData('all', 0)
+      this.t = wx.getStorageSync('t')
+      this.getData('story', 0)
       // this.uploadImg()
     },
 
@@ -88,15 +86,27 @@
       //   })
       // },
       async getData (tab, page) {
+        var type = -1
+        if (tab == 'story') {
+          type = 0
+        } else {
+          type = 1
+        }
         wx.showLoading({
           title: '加载中'
         })
         this.isLoading = true
         const res = await
-          this.$http.get('http://localhost:8081/api?act=post.list&' +
-            'userId=1&size=10&barId=1&pageNum=0&type=-1')
+          this.$http.get(`${api}`,
+            {
+              act: 'post.list',
+              t: this.t,
+              barId: `${barId}`,
+              pageNum: page,
+              size: 10,
+              type: type
+            })
         wx.hideLoading()
-        console.log(res.data.list.length)
         if (res.data.list.length != 0) {
           if (this.cardData[tab].length > 0 && page === 0) {
             // 下拉刷新
@@ -108,6 +118,11 @@
           }
         } else {
           // 获取数据失败
+          wx.showToast({
+            title: '已经没有更新的数据了',
+            icon: 'none',
+            duration: 2000
+          })
         }
         this.isLoading = false
       },
@@ -143,7 +158,7 @@
 <style lang="scss" scoped>
   .container {
     background-color: rgb(245, 245, 249);
-    font-size: 30 rpx;
+    font-size: 30rpx;
     overflow: hidden;
     width: 100vw;
     .header {
@@ -153,8 +168,8 @@
         background-color: #41b883;
         color: white;
         text-align: center;
-        height: 86 rpx;
-        line-height: 86 rpx;
+        height: 86rpx;
+        line-height: 86rpx;
       }
     }
     .containers {
@@ -168,10 +183,10 @@
   }
 
   .header .header > div + .header > div {
-    border-left: 2 rpx solid white;
+    border-left: 2rpx solid white;
   }
 
   .active {
-    font-weight: bold;
+    font-weight: bolder;
   }
 </style>

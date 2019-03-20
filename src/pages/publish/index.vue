@@ -5,8 +5,11 @@
       <span>标题:</span>
       <input class='input' type="text" placeholder="最少10个字" v-model="title">
     </div>
-    <picker class='picker' @change="bindPickerChange($event)" :value="index" :range="pickerData">
-      <span>选择主题:</span><span style='margin-left:400rpx;'>{{pickerData[index]}}</span>
+    <picker class='picker' @change="bindPickerChange($event)" :value="type.index" :range="type.pickerData">
+      <span>类型:</span><span style='margin-left:400rpx;'>{{type.pickerData[type.index]}}</span>
+    </picker>
+    <picker class='picker' @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">
+      <span>匿名:</span><span style='margin-left:400rpx;'>{{anon.pickerData[anon.index]}}</span>
     </picker>
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
@@ -18,6 +21,7 @@
 <script>
   import login from '../../components/login'
   import { api } from '../../const'
+  import { barId } from '../../const'
 
   export default {
     components: {
@@ -31,35 +35,69 @@
     },
     data () {
       return {
-        pickerData: ['故事贴', '一日一记'],
-        index: 0,
+        type: {
+          pickerData: ['故事贴', '一日一记'],
+          index: -1
+        },
+        anon: {
+          pickerData: ['非匿名', '匿名'],
+          index: -1
+        },
         title: '',
         content: '',
         visible: false,
-        tab: 'markdown' // or preview
+        tab: 'markdown', // or preview
+        t: ''
       }
     },
     methods: {
       bindPickerChange (e) {
         // console.log(e)
-        this.index = e.mp.detail.value
+        this.type.index = e.mp.detail.value
+      },
+      bindPickerChange1 (e) {
+        // console.log(e)
+        this.anon.index = e.mp.detail.value
       },
       changeTab (e) {
         this.tab = e.target.dataset.tab
       },
       async handle () {
-        const res = await this.$http.post(`${api} `, {
-          title: this.title,
-          tab: trans[this.index],
-          content: this.content
-        })
-        if (res.data.success) {
+        if (this.type.index == -1) {
           wx.showToast({
-            title: '发帖成功',
+            title: '请选择类型',
             icon: 'none',
             duration: 2000
           })
         }
+        if (this.anon.index == -1) {
+          wx.showToast({
+            title: '请选择是否匿名',
+            icon: 'none',
+            duration: 2000
+          })
+        }
+        const res = this.$http.get(`${api}`, {
+          act: 'post.add',
+          t: this.t,
+          barId: `${barId}`,
+          title:
+          this.title,
+          content:
+          this.content,
+          type: this.type.index,
+          anonymous: this.anon.index
+        }).then(function (response) {
+          if (!response.data.code) {
+            console.log(response.data.postId)
+            wx.showToast({
+              title: '发帖成功',
+              icon: 'none',
+              duration: 2000
+            })
+          }
+        })
+
       }
       ,
       closeModalEvent () {
@@ -67,6 +105,7 @@
       }
     },
     onShow () {
+      this.t = wx.getStorageSync('t')
       var that = this
       wx.checkSession({
         success () {

@@ -1,7 +1,7 @@
 <template>
   <div class='container'>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
-               :topicId='id' :replyId='replyId'></sendReply>
+               :postId='id' :replyId='replyId'></sendReply>
     <div>
       <div class='header'>
         <div class='author'>

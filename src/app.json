@@ -23,12 +23,6 @@
         "selectedIconPath": "static/home.png"
       },
       {
-        "pagePath": "pages/notice/main",
-        "text":"通知",
-        "iconPath": "static/notice-o.png",
-        "selectedIconPath": "static/notice-o.png"
-      },
-      {
         "pagePath": "pages/publish/main",
         "text": "发帖",
         "iconPath": "static/edit.png",
