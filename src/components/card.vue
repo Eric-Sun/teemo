@@ -5,7 +5,7 @@
            @click.stop='goAuthorPage'>
       <div class='info'>
         <span>{{item.userName}}</span>
-        <span class='time'>{{item.createtime}}</span>
+        <span class='time'>{{formatCreateAt}}</span>
       </div>
       <span class="top" v-if="item.top">置顶</span>
     </div>
@@ -38,10 +38,10 @@
     },
     computed: {
       formatLastReply () {
-        return passTime(this.item.last_reply_at)
+        return passTime(this.item.createtime)
       },
       formatCreateAt () {
-        return passTime(this.item.create_at)
+        return passTime(this.item.createtime)
       }
     },
     methods: {
@@ -62,9 +62,9 @@
 
 <style lang='scss' scoped>
   .container {
-    height: 330 rpx;
-    padding: 30 rpx;
-    margin-bottom: 20 rpx;
+    /*height: 330rpx;*/
+    padding: 30rpx;
+    margin-bottom: 20rpx;
     background-color: white;
     display: flex;
     flex-direction: column;
@@ -74,29 +74,31 @@
       display: flex;
       align-items: center;
       .head-img {
-
+        border-radius: 45rpx;
         width: 64rpx;
-        height: 64rpx ;
+        height: 64rpx;
       }
 
       .info {
         flex-direction: column;
         display: flex;
-        margin-left: 26 rpx;
+        margin-left: 26rpx;
         .time {
+          font-size: 10px;
           color: $borderColor;
         }
       }
       .top {
         position: absolute;
-        right: 40 rpx;
+        right: 40rpx;
         color: red;
       }
     }
     .body {
-      color: $color;
+     // color: $color;
+      margin-top: 10rpx;
       & > p {
-        font-weight: bold;
+        /*font-weight: bold;*/
       }
     }
     .foot {
@@ -104,9 +106,10 @@
       justify-content: space-between;
       .number {
         color: $borderColor;
-        font-size: 26 rpx;
+        padding-left: 10rpx;
+        font-size: 26rpx;
         & + & {
-          margin-left: 20 rpx;
+          margin-left: 20rpx;
         }
       }
     }

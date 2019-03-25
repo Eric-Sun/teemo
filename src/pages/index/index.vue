@@ -165,8 +165,8 @@
       display: flex;
       & > div {
         width: 20%;
-        background-color: #41b883;
-        color: white;
+        /*background-color: #41b883;*/
+        color: black;
         text-align: center;
         height: 86rpx;
         line-height: 86rpx;

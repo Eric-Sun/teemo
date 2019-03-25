@@ -1,56 +1,66 @@
 <template>
   <div class='container'>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
-               :postId='id' :replyId='replyId'></sendReply>
+               :postId='id' :replyId='replyId' :replyUserName='replyUserName'></sendReply>
     <div>
-      <div class='header'>
-        <div class='author'>
-          <img class='author-img' :src='detailData.userAvatarUrl' alt="头像">
-          <span class='name'>{{detailData.userName}}</span>
+      <div class='head'>
+        <img class='head-img' :src='detailData.userAvatarUrl'
+             @click.stop='goAuthorPage'>
+        <div class='info'>
+          <span>{{detailData.userName}}</span>
+          <span class='time'>{{formatCreateAt}}</span>
         </div>
-        <div class='list'><img @click.stop="collect"
-                               :src="detailData.is_collect?'/static/star2.png':'/static/star1.png'"
-                               style='width:40rpx;height:40rpx;'><span>楼主</span></div>
       </div>
+
       <scroll-view class='body' scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
                    @scrolltolower='getMore'>
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
-          <div class='time-info'>
-            <span>发布于:{{formatCreateAt}}</span>
-            <span>浏览:{{detailData.visit_count}}</span>
-            <span>评论:{{detailData.reply_count}}</span>
-          </div>
         </div>
-        <img class='up-png' src="/static/up.png" mode='widthFix' @click.stop="goTop">
-        <div v-if='!sendVisible' class='reply-buton' @click.stop="showReplyModal">评论</div>
         <div class='content'>
-          <textarea>{{detailData.content}}</textarea>
+          {{detailData.content}}
         </div>
+
         <div class='reply'>
-          <div>评论：</div>
+          <div class="reply-title">评论 {{formatReplies.length}}</div>
+
           <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
-            <div class='head'>
+            <div class='reply-head'>
               <img class='head-img' :src='item.userAvatarUrl'
-                   @click.stop='goAuthorPage'>
-              <div class='info'>
-                <span>{{item.userNamer}}</span>
-                <span class='time'>{{item.createtime}}</span>
-              </div>
+                   @click.stop='goAuthorPage'/>
             </div>
-            <p class='reply-content'>
-              <textarea>{{item.content}}</textarea>
-            </p>post
-            <div class='foot'>
-              <div :data-replyid='item.id' :data-originindex='originindex' @click.stop="upOrCancel($event)"><img
-                class='icon' :src="(!item.is_uped)?'/static/good1.png':'/static/good2.png'"/><span>点赞:</span>
+            <div class="reply-info">
+              <span>{{item.userName}}</span>
+              <div class='reply-content'>
+                {{item.content}}:{{item.replyList.length}}
               </div>
-              <div  @click.stop="showReplyModal($event)" :data-replyid='item.id'>
-                <img class='icon' src='/static/chat.png'/><span>回复</span></div>
+              <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
+                <div class="">{{innerItem.userName}}:{{innerItem.content}}</div>
+              </div>
+              <div class="reply-foot">
+                <div class="time">
+                  {{formatCreateAt}}
+                </div>
+                <div class="action">
+                  <img class="item"
+                       :data-username="item.userName" :data-replyid='item.replyId' @click.stop="showReplyModal($event)"
+                       src="../../../static/comment.png"/>
+                </div>
+              </div>
+              <div class="reply-divide"></div>
             </div>
           </div>
         </div>
       </scroll-view>
+    </div>
+    <div class="controller">
+      <div class="group1">
+        <img class="comment" @click="showReplyModal" src="../../../static/comment.png"/>
+        <img class="praise" src="../../../static/praise.png"/>
+      </div>
+      <div class="">
+        <img class="share" src="../../../static/share.png"/>
+      </div>
     </div>
   </div>
 </template>
@@ -97,15 +107,13 @@
           postId: this.id
         })
         wx.hideLoading()
-        console.log(res.data)
         this.detailData = res.data
         const res2 = await this.$http.get(`${api}`, {
           act: 'reply.list',
           pageNum: 0,
           size: 10,
-          postId: 29
+          postId: this.id
         })
-        console.log(res2.data.data)
         this.currentReplies = res2.data.data
 
       },
@@ -205,23 +213,26 @@
         }
       },
       showReplyModal (e) {
-        const replyname = e.currentTarget.dataset.loginname
-        if (replyname) {
-          this.content = `@${replyname} `
+        const userName = e.currentTarget.dataset.username
+        const replyId = e.currentTarget.dataset.replyid
+        if (userName) {
+          this.content = `@${userName}:`
         } else {
           this.content = ''
         }
 
-        this.replyId = e.currentTarget.dataset.replyid
+        this.replyId = replyId
+        this.replyUserName = userName
         this.sendVisible = true
       },
       replySuccess () {
+        this.closeModal()
         wx.showToast({
           title: '评论成功',
           icon: 'none',
           duration: 1500
+
         })
-        this.closeModal()
         this.getData()
       },
       closeModal () {
@@ -244,7 +255,8 @@
         id: '',
         replyId: '',
         top: 0,
-        timer: null
+        timer: null,
+        replyUserName: ''
       }
     }
   }
@@ -254,111 +266,157 @@
   .container {
     height: 100vh;
     background-color: rgb(245, 245, 239);
-    .header {
-      display: flex;
-      justify-content: space-between;
+    .head {
       background-color: white;
-      margin-bottom: 20rpx;
-      padding: 30rpx;
-      .author {
-        color: $color;
-        display: flex;
-        align-items: center;
-        .author-img {
-          width: 64rpx;
-          height: 64rpx;
-        }
-        .name {
-          margin-left: 20rpx;
-        }
+      color: $color;
+      display: flex;
+      align-items: center;
+      .head-img {
+        border-radius: 45rpx;
+        width: 64rpx;
+        height: 64rpx;
       }
-      .list {
+
+      .info {
+        flex-direction: column;
         display: flex;
-        align-items: center;
+        margin-left: 26rpx;
+        .time {
+          font-size: 10px;
+          color: $borderColor;
+        }
       }
     }
     .body {
-      height: 90vh;
-    }
-    .title {
-      background-color: white;
-      margin-bottom: 20rpx;
-      padding: 30rpx;
-      .big {
-        font-size: 50rpx;
-      }
-      .time-info {
-        display: flex;
-        justify-content: space-around;
-      }
-    }
-    .reply-buton {
-      border-radius: 50%;
-      width: 100rpx;
-      height: 100rpx;
-      text-align: center;
-      font-size: 30rpx;
-      position: fixed;
-      line-height: 100rpx;
-      background-color: $color;
-      top: 86vh;
-      left: 81vw;
-      color: white;
-    }
-    .up-png {
-      width: 100rpx;
-      top: 75vh;
-      left: 81vw;
-      position: fixed;
-    }
-    .content {
-      background-color: white;
-      margin-bottom: 20rpx;
-      padding: 30rpx;
-    }
-  }
-
-  .reply {
-    background-color: white;
-    margin-bottom: 20rpx;
-    padding: 30rpx;
-    .reply-container {
-      padding: 30rpx;
-      .head {
-        color: $color;
-        display: flex;
-        align-items: center;
-        .head-img {
-          width: 64rpx;
-          height: 64rpx;
+      .title {
+        background-color: white;
+        padding-left: 30rpx;
+        .big {
+          font-size: 50rpx;
         }
-        .info {
-          flex-direction: column;
+      }
+      .content {
+        background-color: white;
+        padding-left: 30rpx;
+        margin-bottom: 20rpx;
+      }
+
+      .reply {
+        background-color: white;
+        margin-bottom: 20rpx;
+        .reply-title {
+          font-size: 25rpx;
+          margin-bottom: 20rpx;
+          margin-left: 25rpx;
+          font-weight: lighter;
+
+        }
+
+        .reply-container {
           display: flex;
-          margin-left: 26rpx;
-          .time {
-            color: $borderColor;
+          .reply-head {
+            margin-left: 25rpx;
+            .head-img {
+              border-radius: 45rpx;
+              width: 64rpx;
+              height: 64rpx;
+            }
+          }
+          .reply-info {
+            display: flex;
+            flex-direction: column;
+            margin-left: 20rpx;
+            margin-bottom: 20rpx;
+            width: 100%;
+            & > span {
+              font-weight: lighter;
+              color: gray;
+              font-size: 25rpx;
+            }
+            .reply-content {
+              font-weight: 200;
+              font-size: 35rpx;
+            }
+            .reply-foot {
+              display: flex;
+              justify-content: space-between;
+              font-size: 25rpx;
+              font-weight: lighter;
+              margin-right: 50rpx;
+              .time {
+                color: gray;
+              }
+              .action {
+                .item {
+                  height: 50rpx;
+                  width: 50rpx;
+                  margin-left: 50rpx;
+                }
+              }
+            }
+            .reply-divide {
+              border-bottom: 1px solid #ccc;
+              margin-bottom: 20rpx;
+              margin-top: 20rpx;
+              margin-right: 20rpx;
+            }
           }
         }
+
       }
-      .reply-content {
-        font-size: 40rpx;
-        & + & {
-          border-top: 2rpx solid $borderColor;
-        }
+      .reply-buton {
+        border-radius: 50%;
+        width: 100rpx;
+        height: 100rpx;
+        text-align: center;
+        font-size: 30rpx;
+        position: fixed;
+        line-height: 100rpx;
+        background-color: $color;
+        top: 86vh;
+        left: 81vw;
+        color: white;
       }
-      .foot {
-        display: flex;
-        & > div {
-          margin-right: 20rpx;
-          display: flex;
-          align-items: center;
-        }
-        .icon {
-          width: 56rpx;
-          height: 56rpx;
-        }
+      .up-png {
+        width: 100rpx;
+        top: 75vh;
+        left: 81vw;
+        position: fixed;
       }
+
+    }
+
+  }
+
+  .controller {
+    border-top: 1px solid #ccc;
+    height: 100rpx;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+    display: flex;
+    justify-content: space-between;
+    .group1 {
+      display: flex;
+      margin-right: 20rpx;
+      .comment {
+        height: 50rpx;
+        width: 50rpx;
+        margin: 25rpx;
+      }
+      .praise {
+        height: 50rpx;
+        width: 50rpx;
+        margin: 25rpx;
+      }
+
+    }
+    .share {
+      margin: 25rpx;
+      height: 50rpx;
+      width: 50rpx;
     }
   }
 </style>

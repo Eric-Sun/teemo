@@ -1,11 +1,11 @@
 <template>
   <div class="mask" @click.stop="closeModal">
     <div class="container" @click.stop="prevent">
-      <textarea class='textarea' v-model="content" placeholder="说点啥....."></textarea>
-      <picker @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">
-        <span>匿名:</span><span style='margin-left:400rpx;'>{{anon.pickerData[anon.index]}}</span>
-      </picker>
-      <button class="button" @click.stop="send">提交</button>
+      <input class='text' v-model="content" placeholder="说点啥....."></input>
+      <!--<picker @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">-->
+      <!--<span>匿名:</span><span style='margin-left:400rpx;'>{{anon.pickerData[anon.index]}}</span>-->
+      <!--</picker>-->
+      <label class="button" @click.stop="send">提交</label>
     </div>
   </div>
 </template>
@@ -16,6 +16,10 @@
     props: {
       postId: 0,
       replyId: {
+        default: '',
+        type: String
+      },
+      replyUserName: {
         default: '',
         type: String
       },
@@ -38,30 +42,28 @@
 
       },
       async send () {
+        var that = this
         const t = wx.getStorageSync('t')
-        try {
-          const res = await this.$http.post(
-            `${api}`,
-            {
-              t: t,
-              content: this.content,
-              postId: this.postId,
-              barId: `${barId}`,
-              anonymous: 0,
-              lastReplyId: 0
-            }
-          )
-          if (res.data.success) {
-            this.content = ''
-            this.$emit('reply-success')
+         var count = `@${this.replyUserName}:`.length;
+        var pureContent = this.content.substring(count);
+
+         await this.$http.get(
+          `${api}`,
+          {
+            act: 'reply.add',
+            t: t,
+            content: pureContent,
+            postId: this.postId,
+            barId: `${barId}`,
+            anonymous: 0,
+            lastReplyId: this.replyId
           }
-        } catch (e) {
-          wx.showToast({
-            title: e.response.data.error_msg,
-            icon: 'none',
-            duration: 2000
-          })
-        }
+        ).then(function (res) {
+          if (!res.data.code) {
+            that.content = ''
+            that.$emit('reply-success')
+          }
+        })
       },
       closeModal () {
         this.$emit('close-modal')
@@ -78,22 +80,25 @@
     background-color: rgba(0, 0, 0, 0.6);
     .container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
       background-color: white;
+      justify-content: space-between;
       position: absolute;
       bottom: 0;
       width: 100%;
       box-sizing: border-box;
-      padding: 20px;
-      .textarea {
+      padding: 10px;
+      .text {
         border: 2rpx solid $borderColor;
+        width: 100%;
       }
       .button {
-        background-color: $color;
-        color: white;
-        width: 300rpx;
-        margin-top: 26rpx;
+        color: dodgerblue;
+        height: 50rpx;
+        width: 100rpx;
+        margin-right: 25rpx;
+        margin-left:25rpx
+        /*width: 70rpx;*/
+        /*margin-top: 26rpx;*/
       }
     }
   }
