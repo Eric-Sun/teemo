@@ -2,7 +2,7 @@
   <div class='container' @click.stop="goDetail($event)">
     <div class='head'>
       <img class='head-img' :src='item.userAvatarUrl'
-           @click.stop='goAuthorPage'>
+           @click.stop='goAuthorPage' :data-userid="item.userId">
       <div class='info'>
         <span>{{item.userName}}</span>
         <span class='time'>{{formatCreateAt}}</span>
@@ -12,14 +12,9 @@
     <div class='body'>
       <p>{{item.content}}</p>
     </div>
-    <div class='foot'>
-      <div class='count' v-if='!hidden'>
-        <span class='number'>回答</span>
-        <span class='number'>浏览</span>
-      </div>
-      <div class='later'>
-        <span class='number'>最新动态</span>
-      </div>
+    <div class='foot' v-if='!hidden'>
+      <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
+      <div class="reply-count">{{item.replyCount}}</div>
     </div>
   </div>
 </template>
@@ -48,7 +43,7 @@
       goAuthorPage (e) {
         // e.currentTarget.dataset.author
         wx.navigateTo({
-          url: `../user/main?loginname=${e.currentTarget.dataset.loginname}`
+          url: `../user/main?userId=${e.currentTarget.dataset.userid}`
         })
       },
       goDetail () {
@@ -95,22 +90,27 @@
       }
     }
     .body {
-     // color: $color;
+      // color: $color;
       margin-top: 10rpx;
+      margin-bottom: 20rpx;
       & > p {
         /*font-weight: bold;*/
+        font-size: 40rpx;
       }
     }
     .foot {
       display: flex;
-      justify-content: space-between;
-      .number {
-        color: $borderColor;
-        padding-left: 10rpx;
-        font-size: 26rpx;
-        & + & {
-          margin-left: 20rpx;
-        }
+      flex-direction: row;
+      .reply-img {
+        margin-left: 20rpx;
+        height: 35rpx;
+        width: 35rpx;
+
+      }
+      .reply-count {
+        margin-left: 10rpx;
+        height: 35rpx;
+        font-weight: 100;
       }
     }
   }

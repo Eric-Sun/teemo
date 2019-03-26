@@ -32,11 +32,19 @@
             <div class="reply-info">
               <span>{{item.userName}}</span>
               <div class='reply-content'>
-                {{item.content}}:{{item.replyList.length}}
+                {{item.content}}
               </div>
               <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
-                <div class="">{{innerItem.userName}}:{{innerItem.content}}</div>
+                <div class="reply-replyList-line">
+                  <div class="reply-replyList-name">{{innerItem.userName}}:</div>
+
+                  <div class="reply-replyList-content">
+                    {{innerItem.lastReplyUserId!=0?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+                  </div>
+                </div>
+
               </div>
+              <div class="reply-replyList-tips" v-if="item.replySize>1">一共{{item.replySize}}条回复</div>
               <div class="reply-foot">
                 <div class="time">
                   {{formatCreateAt}}
@@ -322,11 +330,28 @@
               height: 64rpx;
             }
           }
+          .reply-replyList {
+            background-color: gray;
+            .reply-replyList-line {
+              display: flex;
+              flex-direction: row;
+              .reply-replyList-name {
+                color: blue;
+              }
+              .reply-replyList-content {
+                width: 100%;
+                word-wrap: break-word;
+                word-break: break-all;
+              }
+
+            }
+          }
           .reply-info {
             display: flex;
             flex-direction: column;
             margin-left: 20rpx;
             margin-bottom: 20rpx;
+            margin-right:50rpx;
             width: 100%;
             & > span {
               font-weight: lighter;
@@ -334,6 +359,10 @@
               font-size: 25rpx;
             }
             .reply-content {
+              width: 100%;
+
+              word-wrap: break-word;
+              word-break: break-all;
               font-weight: 200;
               font-size: 35rpx;
             }
@@ -359,6 +388,11 @@
               margin-bottom: 20rpx;
               margin-top: 20rpx;
               margin-right: 20rpx;
+            }
+            .reply-replyList-tips{
+              display: flex;
+              justify-content: center;
+              color:blueviolet;
             }
           }
         }
