@@ -44,10 +44,15 @@
       async send () {
         var that = this
         const t = wx.getStorageSync('t')
-         var count = `@${this.replyUserName}:`.length;
-        var pureContent = this.content.substring(count);
+        var pureContent = ''
+        if (this.replyId != 0) {
+          var count = `@${this.replyUserName}:`.length
+          pureContent = this.content.substring(count)
+        } else {
+          pureContent = this.content
+        }
 
-         await this.$http.get(
+        await this.$http.get(
           `${api}`,
           {
             act: 'reply.add',
@@ -96,7 +101,7 @@
         height: 50rpx;
         width: 100rpx;
         margin-right: 25rpx;
-        margin-left:25rpx
+        margin-left: 25rpx
         /*width: 70rpx;*/
         /*margin-top: 26rpx;*/
       }

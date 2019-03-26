@@ -38,27 +38,31 @@
       },
       async getData () {
         const t = wx.getStorageSync('t')
-          const res = await this.$http.get(`${api}`,
-            {
-              act: 'user.info',
-              t: t
-            })
-          if (res.data.code == null) {
-            this.user = res.data
-          }
+        const res = await this.$http.get(`${api}`,
+          {
+            act: 'user.info',
+            t: t
+          })
+        if (res.data.code == null) {
+          this.user = res.data
+        }
       }
     },
     mounted () {
       var that = this
-      wx.checkSession({
-        success () {
+      var t = wx.getStorageSync('t')
+      this.$http.get(`${api}`,
+        {
+          act: 'user.checkToken',
+          t: t
+        }).then(function (res) {
+        if (res.data.result == 1) {
+          that.visible = true;
+        } else {
           that.getData()
-        },
-        fail () {
-          that.visible = true
         }
-      })
 
+      })
     }
   }
 </script>
