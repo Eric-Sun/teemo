@@ -1,60 +1,54 @@
 <template>
   <div class='container'>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
-               :postId='id' :replyId='replyId' :replyUserName='replyUserName'></sendReply>
+               :postId='postId' :replyId='replyId' :replyUserName='replyUserName'></sendReply>
     <div>
-      <div class='head'>
-        <img class='head-img' :src='reply.userAvatarUrl'
-             @click.stop='goAuthorPage'>
-        <div class='info'>
-          <span>{{reply.userName}}</span>
-          <span class='time'>{{formatCreateAt}}</span>
-        </div>
-      </div>
-
-      <scroll-view class='body' scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
+      <scroll-view scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
                    @scrolltolower='getMore'>
-        <div class='content'>
-          {{reply.content}}
+        <div class='head'>
+          <img class='head-img' :src='reply.userAvatarUrl'
+               @click.stop='goAuthorPage'>
+          <div class='info'>
+            <span>{{reply.userName}}</span>
+            <span class='time'>{{formatCreateAt}}</span>
+            <div class='content'>
+              {{reply.content}}
+            </div>
+
+          </div>
         </div>
 
-        <div class='reply'>
-          <div class="reply-title">评论 {{reply.replySize}}</div>
+        <div class="body">
+          <div class='reply'>
 
-          <div class='reply-container' v-for='(item,originindex) in reply.replyList' :key='item.id' :data-id='item.id'>
-            <div class='reply-head'>
-              <img class='head-img' :src='item.userAvatarUrl'
-                   @click.stop='goAuthorPage'/>
-            </div>
-            <div class="reply-info">
-              <span>{{item.userName}}</span>
-              <div class='reply-content'>
-                {{item.content}}
+            <div class='reply-container' v-for='(item,originindex) in reply.replyList' :key='item.id'
+                 :data-id='item.id'>
+              <div class='reply-head'>
+                <img class='head-img' :src='item.userAvatarUrl'
+                     @click.stop='goAuthorPage'/>
               </div>
-              <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
-                <div class="reply-replyList-line">
-                  <div class="reply-replyList-name">{{innerItem.userName}}:</div>
-
-                  <div class="reply-replyList-content">
-                    {{innerItem.lastReplyUserId!=0?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+              <div class="reply-info">
+                <span>{{item.userName}}</span>
+                <div class='reply-content'>
+                  {{item.lastReplyId!=reply.replyId?'回复@'+item.lastReplyUserName+':'+item.content:item.content}}
+                </div>
+                <div class="reply-foot">
+                  <div class="time">
+                    {{formatCreateAt}}
                   </div>
-                </div>
-
-              </div>
-              <div class="reply-foot">
-                <div class="time">
-                  {{formatCreateAt}}
-                </div>
-                <div class="action">
-                  <img class="item"
-                       :data-username="item.userName" :data-replyid='item.replyId' @click.stop="showReplyModal($event)"
-                       src="../../../static/comment.png"/>
+                  <div class="action">
+                    <img class="item"
+                         :data-username="item.userName" :data-replyid='item.replyId'
+                         @click.stop="showReplyModal($event)"
+                         src="../../../static/comment.png"/>
+                  </div>
                 </div>
               </div>
               <div class="reply-divide"></div>
             </div>
           </div>
         </div>
+
       </scroll-view>
     </div>
   </div>
@@ -91,7 +85,7 @@
         const res = await this.$http.get(`${api}`, {
           t: t,
           act: 'reply.detail',
-          replyId: this.replyId,
+          replyId: this.currentReplyId,
           size: 5,
           pageNum: 0
         })
@@ -145,8 +139,8 @@
     }
     ,
     onLoad () {
-      this.replyId = this.$root.$mp.query.replyId
-      console.log('replyId=' + this.replyId)
+      this.currentReplyId = this.$root.$mp.query.replyId
+      this.postId =this.$root.$mp.query.postId
     }
     ,
     data () {
@@ -154,7 +148,9 @@
         reply: {},
         sendVisible: false,
         replyId: 0,
-        top: 0
+        top: 0,
+        currentReplyId:0,
+        postId:0
       }
     }
   }
@@ -162,13 +158,14 @@
 
 <style lang='scss' scoped>
   .container {
-    height: 100vh;
+    /*height: 100vh;*/
     background-color: rgb(245, 245, 239);
     .head {
       background-color: white;
       color: $color;
       display: flex;
-      align-items: center;
+      padding-left: 20rpx;
+      /*align-items: center;*/
       .head-img {
         border-radius: 45rpx;
         width: 64rpx;
@@ -183,26 +180,27 @@
           font-size: 10px;
           color: $borderColor;
         }
+        .content {
+          width: 500rpx;
+          word-wrap: break-word;
+          word-break: break-all;
+          margin-bottom: 20rpx;
+        }
       }
+
     }
     .body {
+      background-color: rgb(245, 245, 239);
       .title {
-        background-color: white;
+        /*background-color: white;*/
         padding-left: 30rpx;
         .big {
           font-size: 50rpx;
         }
       }
-      .content {
-        width: 100%;
-        word-wrap: break-word;
-        word-break: break-all;
-        padding-left: 30rpx;
-        margin-bottom: 20rpx;
-      }
 
       .reply {
-        background-color: white;
+        /*background-color: white;*/
         margin-bottom: 20rpx;
         .reply-title {
           font-size: 25rpx;
@@ -222,22 +220,6 @@
               height: 64rpx;
             }
           }
-          .reply-replyList {
-            background-color: gray;
-            .reply-replyList-line {
-              display: flex;
-              flex-direction: row;
-              .reply-replyList-name {
-                color: blue;
-              }
-              .reply-replyList-content {
-                width: 100%;
-                word-wrap: break-word;
-                word-break: break-all;
-              }
-
-            }
-          }
           .reply-info {
             display: flex;
             flex-direction: column;
@@ -252,12 +234,12 @@
             }
             .reply-content {
               width: 100%;
-
               word-wrap: break-word;
               word-break: break-all;
               font-weight: 200;
               font-size: 35rpx;
             }
+
             .reply-foot {
               display: flex;
               justify-content: space-between;
@@ -275,18 +257,15 @@
                 }
               }
             }
-            .reply-divide {
-              border-bottom: 1px solid #ccc;
-              margin-bottom: 20rpx;
-              margin-top: 20rpx;
-              margin-right: 20rpx;
-            }
-            .reply-replyList-tips {
-              display: flex;
-              justify-content: center;
-              color: blueviolet;
-            }
+
           }
+          .reply-divide {
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20rpx;
+            margin-top: 20rpx;
+            margin-right: 20rpx;
+          }
+
         }
 
       }

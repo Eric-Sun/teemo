@@ -22,6 +22,7 @@
 <script>
   import card from '@/components/card'
   import { api, barId } from '../../const'
+  import login from '../../components/login'
 
   export default {
     data () {
@@ -41,7 +42,8 @@
     },
 
     components: {
-      card
+      card,
+      login
     },
 
     mounted () {
@@ -55,18 +57,18 @@
         if (res.data.result == 1) {
           that.visible = true
         } else {
-          that.getData()
+          that.getData('story', 0)
         }
 
       })
       this.t = wx.getStorageSync('t')
-      this.getData('story', 0)
+
     },
 
     methods: {
       closeModalEvent () {
         this.visible = false
-        this.getData()
+        this.getData('story', 0)
       },
 
       // async uploadImg () {

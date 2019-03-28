@@ -51,7 +51,7 @@
         } else {
           pureContent = this.content
         }
-
+        console.log(this.replyId)
         await this.$http.get(
           `${api}`,
           {

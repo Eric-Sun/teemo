@@ -39,13 +39,14 @@
                   <div class="reply-replyList-name">{{innerItem.userName}}:</div>
 
                   <div class="reply-replyList-content">
-                    {{innerItem.lastReplyUserId!=0?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+                    {{innerItem.lastReplyId!=item.replyId?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
                   </div>
                 </div>
 
               </div>
               <div class="reply-replyList-tips" v-if="item.replySize>1"
-                   @click.stop="navigateToReply($event)" :data-replyid="item.replyId">一共{{item.replySize}}条回复
+                   @click.stop="navigateToReply($event)"
+                   :data-replyid="item.replyId" :data-postid="id">一共{{item.replySize}}条回复
               </div>
               <div class="reply-foot">
                 <div class="time">
@@ -107,8 +108,10 @@
     methods: {
       navigateToReply (e) {
         var replyId = e.currentTarget.dataset.replyid
+        var postId = e.currentTarget.dataset.postid
+
         wx.navigateTo({
-          url: `../reply/main?replyId=${replyId}`
+          url: `../reply/main?replyId=${replyId}&postId=${postId}`
         })
       },
       onScroll: debounceOnScroll(),
