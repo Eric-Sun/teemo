@@ -1,7 +1,9 @@
 <template>
   <div class='container'>
+    <login :visible='visible' v-on:modalClose='closeModalEvent'></login>
     <div class='header'>
-      <div :class='{ active: tab==="story" }' @click.stop='changeTab($event)' data-tab='story' :data-offset='0'>故事贴</div>
+      <div :class='{ active: tab==="story" }' @click.stop='changeTab($event)' data-tab='story' :data-offset='0'>故事贴
+      </div>
       <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记
       </div>
     </div>
@@ -33,7 +35,8 @@
         },
         isLoading: false,
         list: ['story', 'diary'],
-        animation: {}
+        animation: {},
+        visible: false
       }
     },
 
@@ -42,12 +45,29 @@
     },
 
     mounted () {
+      var t = wx.getStorageSync('t')
+      var that = this
+      this.$http.get(`${api}`,
+        {
+          act: 'user.checkToken',
+          t: t
+        }).then(function (res) {
+        if (res.data.result == 1) {
+          that.visible = true
+        } else {
+          that.getData()
+        }
+
+      })
       this.t = wx.getStorageSync('t')
       this.getData('story', 0)
-      // this.uploadImg()
     },
 
     methods: {
+      closeModalEvent () {
+        this.visible = false
+        this.getData()
+      },
 
       // async uploadImg () {
       //   console.log(1);

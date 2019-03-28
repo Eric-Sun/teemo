@@ -6,7 +6,8 @@
     "pages/notice/main",
     "pages/me/main",
     "pages/publish/main",
-    "pages/user/main"
+    "pages/user/main",
+    "pages/reply/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
