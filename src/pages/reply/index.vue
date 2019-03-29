@@ -20,27 +20,28 @@
 
         <div class="body">
           <div class='reply'>
-
-            <div class='reply-container' v-for='(item,originindex) in reply.replyList' :key='item.id'
+            <div class='reply-container-with-divide' v-for='(item,originindex) in reply.replyList' :key='item.id'
                  :data-id='item.id'>
-              <div class='reply-head'>
-                <img class='head-img' :src='item.userAvatarUrl'
-                     @click.stop='goAuthorPage'/>
-              </div>
-              <div class="reply-info">
-                <span>{{item.userName}}</span>
-                <div class='reply-content'>
-                  {{item.lastReplyId!=reply.replyId?'回复@'+item.lastReplyUserName+':'+item.content:item.content}}
+              <div class="reply-container">
+                <div class='reply-head'>
+                  <img class='head-img' :src='item.userAvatarUrl'
+                       @click.stop='goAuthorPage'/>
                 </div>
-                <div class="reply-foot">
-                  <div class="time">
-                    {{formatCreateAt}}
+                <div class="reply-info">
+                  <span>{{item.userName}}</span>
+                  <div class='reply-content'>
+                    {{item.lastReplyId!=reply.replyId?'回复@'+item.lastReplyUserName+':'+item.content:item.content}}
                   </div>
-                  <div class="action">
-                    <img class="item"
-                         :data-username="item.userName" :data-replyid='item.replyId'
-                         @click.stop="showReplyModal($event)"
-                         src="../../../static/comment.png"/>
+                  <div class="reply-foot">
+                    <div class="time">
+                      {{formatCreateAt}}
+                    </div>
+                    <div class="action">
+                      <img class="item"
+                           :data-username="item.userName" :data-replyid='item.replyId'
+                           @click.stop="showReplyModal($event)"
+                           src="../../../static/comment.png"/>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -140,7 +141,7 @@
     ,
     onLoad () {
       this.currentReplyId = this.$root.$mp.query.replyId
-      this.postId =this.$root.$mp.query.postId
+      this.postId = this.$root.$mp.query.postId
     }
     ,
     data () {
@@ -149,8 +150,8 @@
         sendVisible: false,
         replyId: 0,
         top: 0,
-        currentReplyId:0,
-        postId:0
+        currentReplyId: 0,
+        postId: 0
       }
     }
   }
@@ -162,14 +163,13 @@
     background-color: rgb(245, 245, 239);
     .head {
       background-color: white;
-      color: $color;
       display: flex;
       padding-left: 20rpx;
       /*align-items: center;*/
       .head-img {
         border-radius: 45rpx;
-        width: 64rpx;
-        height: 64rpx;
+        width: 75rpx;
+        height: 75rpx;
       }
 
       .info {
@@ -177,7 +177,7 @@
         display: flex;
         margin-left: 26rpx;
         .time {
-          font-size: 10px;
+          font-size: 25rpx;
           color: $borderColor;
         }
         .content {
@@ -190,6 +190,7 @@
 
     }
     .body {
+      padding: 15rpx;
       background-color: rgb(245, 245, 239);
       .title {
         /*background-color: white;*/
@@ -201,7 +202,6 @@
 
       .reply {
         /*background-color: white;*/
-        margin-bottom: 20rpx;
         .reply-title {
           font-size: 25rpx;
           margin-bottom: 20rpx;
@@ -209,53 +209,57 @@
           font-weight: lighter;
 
         }
-
-        .reply-container {
-          display: flex;
-          .reply-head {
-            margin-left: 25rpx;
-            .head-img {
-              border-radius: 45rpx;
-              width: 64rpx;
-              height: 64rpx;
-            }
-          }
-          .reply-info {
+        .reply-container-with-divide {
+          display:flex;
+          flex-direction: column;
+          .reply-container {
             display: flex;
-            flex-direction: column;
-            margin-left: 20rpx;
-            margin-bottom: 20rpx;
-            margin-right: 50rpx;
-            width: 100%;
-            & > span {
-              font-weight: lighter;
-              color: gray;
-              font-size: 25rpx;
-            }
-            .reply-content {
-              width: 100%;
-              word-wrap: break-word;
-              word-break: break-all;
-              font-weight: 200;
-              font-size: 35rpx;
-            }
-
-            .reply-foot {
-              display: flex;
-              justify-content: space-between;
-              font-size: 25rpx;
-              font-weight: lighter;
-              margin-right: 50rpx;
-              .time {
-                color: gray;
+            .reply-head {
+              margin-left: 25rpx;
+              .head-img {
+                border-radius: 45rpx;
+                width: 75rpx;
+                height: 75rpx;
               }
-              .action {
-                .item {
-                  height: 50rpx;
-                  width: 50rpx;
-                  margin-left: 50rpx;
+            }
+            .reply-info {
+              display: flex;
+              flex-direction: column;
+              margin-left: 20rpx;
+              margin-right: 50rpx;
+              width: 100%;
+              & > span {
+                font-weight: lighter;
+                color: gray;
+                font-size: 35rpx;
+              }
+              .reply-content {
+                width: 100%;
+                word-wrap: break-word;
+                word-break: break-all;
+                font-weight: 200;
+                font-size: 35rpx;
+              }
+
+              .reply-foot {
+                display: flex;
+                justify-content: space-between;
+                font-size: 30rpx;
+                font-weight: lighter;
+                margin-right: 50rpx;
+                .time {
+                  font-size: 25rpx;
+                  color: gray;
+                }
+                .action {
+                  .item {
+                    height: 40rpx;
+                    width: 40rpx;
+                    margin-left: 50rpx;
+                  }
                 }
               }
+
             }
 
           }
@@ -265,7 +269,6 @@
             margin-top: 20rpx;
             margin-right: 20rpx;
           }
-
         }
 
       }

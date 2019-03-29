@@ -34,20 +34,22 @@
               <div class='reply-content'>
                 {{item.content}}
               </div>
-              <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
-                <div class="reply-replyList-line">
-                  <div class="reply-replyList-name">{{innerItem.userName}}:</div>
+              <div class="reply-replyList-div" v-if="item.replyList.length!=0">
+                <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
+                  <div class="reply-replyList-line">
 
-                  <div class="reply-replyList-content">
-                    {{innerItem.lastReplyId!=item.replyId?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+                    <div class="reply-replyList-content">
+                      <span class="reply-replyList-name">{{innerItem.userName}}</span>:{{innerItem.lastReplyId!=item.replyId?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+                    </div>
                   </div>
-                </div>
 
+                </div>
+                <div class="reply-replyList-tips" v-if="item.replySize>1"
+                     @click.stop="navigateToReply($event)"
+                     :data-replyid="item.replyId" :data-postid="id">一共{{item.replySize}}条回复
+                </div>
               </div>
-              <div class="reply-replyList-tips" v-if="item.replySize>1"
-                   @click.stop="navigateToReply($event)"
-                   :data-replyid="item.replyId" :data-postid="id">一共{{item.replySize}}条回复
-              </div>
+
               <div class="reply-foot">
                 <div class="time">
                   {{formatCreateAt}}
@@ -284,16 +286,15 @@
 <style lang='scss' scoped>
   .container {
     height: 100vh;
-    background-color: rgb(245, 245, 239);
     .head {
       background-color: white;
-      color: $color;
       display: flex;
       align-items: center;
       .head-img {
         border-radius: 45rpx;
-        width: 64rpx;
-        height: 64rpx;
+        width: 75rpx;
+        height: 75rpx;
+        margin-left: 20rpx;
       }
 
       .info {
@@ -301,7 +302,7 @@
         display: flex;
         margin-left: 26rpx;
         .time {
-          font-size: 10px;
+          font-size: 25rpx;
           color: $borderColor;
         }
       }
@@ -317,14 +318,14 @@
       .content {
         background-color: white;
         padding-left: 30rpx;
-        margin-bottom: 20rpx;
+        font-size: 40rpx;
       }
 
       .reply {
         background-color: white;
         margin-bottom: 20rpx;
         .reply-title {
-          font-size: 25rpx;
+          font-size: 30rpx;
           margin-bottom: 20rpx;
           margin-left: 25rpx;
           font-weight: lighter;
@@ -337,26 +338,11 @@
             margin-left: 25rpx;
             .head-img {
               border-radius: 45rpx;
-              width: 64rpx;
-              height: 64rpx;
+              width: 75rpx;
+              height: 75rpx;
             }
           }
-          .reply-replyList {
-            background-color: gray;
-            .reply-replyList-line {
-              display: flex;
-              flex-direction: row;
-              .reply-replyList-name {
-                color: blue;
-              }
-              .reply-replyList-content {
-                width: 100%;
-                word-wrap: break-word;
-                word-break: break-all;
-              }
 
-            }
-          }
           .reply-info {
             display: flex;
             flex-direction: column;
@@ -365,23 +351,22 @@
             margin-right: 50rpx;
             width: 100%;
             & > span {
-              font-weight: lighter;
-              color: gray;
-              font-size: 25rpx;
+              /*font-weight: lighter;*/
+              /*color: rgb(245, 245, 239);*/
+              font-size: 40rpx;
             }
             .reply-content {
               width: 100%;
-
               word-wrap: break-word;
               word-break: break-all;
-              font-weight: 200;
-              font-size: 35rpx;
+              font-weight: normal;
+              font-size: 40rpx;
             }
             .reply-foot {
               display: flex;
               justify-content: space-between;
               font-size: 25rpx;
-              font-weight: lighter;
+              /*font-weight: lighter;*/
               margin-right: 50rpx;
               .time {
                 color: gray;
@@ -400,10 +385,31 @@
               margin-top: 20rpx;
               margin-right: 20rpx;
             }
-            .reply-replyList-tips {
-              display: flex;
-              justify-content: center;
-              color: blueviolet;
+
+            .reply-replyList-div {
+              background-color: rgb(245, 245, 239);
+              font-size: 35rpx;
+              padding: 15rpx;
+              .reply-replyList {
+                .reply-replyList-line {
+                  display: flex;
+                  flex-direction: row;
+                  .reply-replyList-name {
+                    color: dodgerblue;
+                  }
+                  .reply-replyList-content {
+                    width: 100%;
+                    word-wrap: break-word;
+                    word-break: break-all;
+                    /*font-weight: lighter;*/
+                  }
+
+                }
+              }
+              .reply-replyList-tips {
+                display: flex;
+                color: dodgerblue;
+              }
             }
           }
         }

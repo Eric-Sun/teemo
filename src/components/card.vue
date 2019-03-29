@@ -4,13 +4,13 @@
       <img class='head-img' :src='item.userAvatarUrl'
            @click.stop='goAuthorPage' :data-userid="item.userId">
       <div class='info'>
-        <span>{{item.userName}}</span>
+        <span class="name">{{item.userName}}</span>
         <span class='time'>{{formatCreateAt}}</span>
       </div>
       <span class="top" v-if="item.top">置顶</span>
     </div>
     <div class='body'>
-      <p>{{item.content}}</p>
+      <pre>{{formatContent}}</pre>
     </div>
     <div class='foot' v-if='!hidden'>
       <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
@@ -37,6 +37,12 @@
       },
       formatCreateAt () {
         return passTime(this.item.createtime)
+      },
+      formatContent () {
+        // var reg = new RegExp('\n\n', 'g')
+        // console.log( this.item.content.replace(reg,`<br>`))
+        // return this.item.content.replace(reg,`<br>`)
+        return this.item.content
       }
     },
     methods: {
@@ -65,21 +71,25 @@
     flex-direction: column;
     justify-content: space-between;
     .head {
-      color: $color;
+      color: black;
       display: flex;
       align-items: center;
       .head-img {
         border-radius: 45rpx;
-        width: 64rpx;
-        height: 64rpx;
+        width: 75rpx;
+        height: 75rpx;
       }
 
       .info {
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
+        .name {
+          font-weight: bold;
+          font-size: 40rpx;
+        }
         .time {
-          font-size: 10px;
+          font-size: 25rpx;
           color: $borderColor;
         }
       }
@@ -93,8 +103,12 @@
       // color: $color;
       margin-top: 10rpx;
       margin-bottom: 20rpx;
-      & > p {
-        /*font-weight: bold;*/
+      margin-left: 10rpx;
+      & > pre {
+        white-space: pre-line;
+        text-align: justify;
+        text-justify: inter-ideograph;
+        font-weight: normal;
         font-size: 40rpx;
       }
     }
