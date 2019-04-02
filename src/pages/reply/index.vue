@@ -177,14 +177,16 @@
         display: flex;
         margin-left: 26rpx;
         .time {
-          font-size: 25rpx;
+          font-size: $time-font-size;
           color: $borderColor;
         }
         .content {
-          width: 500rpx;
-          word-wrap: break-word;
-          word-break: break-all;
+          white-space: pre-line;
+          text-align: justify;
+          text-justify: inter-ideograph;
           margin-bottom: 20rpx;
+          margin-right:25rpx;
+          font-size: $content-font-size;
         }
       }
 
@@ -231,14 +233,16 @@
               & > span {
                 font-weight: lighter;
                 color: gray;
-                font-size: 35rpx;
+                font-size: $reply-content-font-size;
               }
               .reply-content {
                 width: 100%;
-                word-wrap: break-word;
-                word-break: break-all;
+                white-space: pre-line;
+                text-align: justify;
+                text-justify: inter-ideograph;
                 font-weight: 200;
-                font-size: 35rpx;
+                font-size: $reply-content-font-size;
+
               }
 
               .reply-foot {

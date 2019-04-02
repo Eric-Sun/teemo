@@ -302,7 +302,7 @@
         display: flex;
         margin-left: 26rpx;
         .time {
-          font-size: 25rpx;
+          font-size: $time-font-size;
           color: $borderColor;
         }
       }
@@ -316,9 +316,13 @@
         }
       }
       .content {
-        background-color: white;
+        white-space: pre-line;
+        text-align: justify;
+        text-justify: inter-ideograph;
+        font-weight: normal;
         padding-left: 30rpx;
-        font-size: 40rpx;
+        padding-right:30rpx;
+        font-size: $content-font-size;
       }
 
       .reply {
@@ -353,14 +357,15 @@
             & > span {
               /*font-weight: lighter;*/
               /*color: rgb(245, 245, 239);*/
-              font-size: 40rpx;
+              font-size: $reply-content-font-size;
             }
             .reply-content {
               width: 100%;
-              word-wrap: break-word;
-              word-break: break-all;
+              white-space: pre-line;
+              text-align: justify;
+              text-justify: inter-ideograph;
               font-weight: normal;
-              font-size: 40rpx;
+              font-size: $content-font-size;
             }
             .reply-foot {
               display: flex;
@@ -388,7 +393,7 @@
 
             .reply-replyList-div {
               background-color: rgb(245, 245, 239);
-              font-size: 35rpx;
+              font-size: $reply-content-font-size;
               padding: 15rpx;
               .reply-replyList {
                 .reply-replyList-line {
@@ -399,8 +404,10 @@
                   }
                   .reply-replyList-content {
                     width: 100%;
-                    word-wrap: break-word;
-                    word-break: break-all;
+                    white-space: pre-line;
+                    text-align: justify;
+                    text-justify: inter-ideograph;
+                    font-size: $reply-content-font-size;
                     /*font-weight: lighter;*/
                   }
 

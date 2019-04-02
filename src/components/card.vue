@@ -86,10 +86,10 @@
         margin-left: 26rpx;
         .name {
           font-weight: bold;
-          font-size: 40rpx;
+          font-size: $userName-font-size;
         }
         .time {
-          font-size: 25rpx;
+          font-size: $time-font-size;
           color: $borderColor;
         }
       }
@@ -109,7 +109,7 @@
         text-align: justify;
         text-justify: inter-ideograph;
         font-weight: normal;
-        font-size: 40rpx;
+        font-size: $content-font-size;
       }
     }
     .foot {
