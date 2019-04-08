@@ -1,13 +1,20 @@
 <template>
   <div class='container' @click.stop="goDetail($event)">
     <div class='head'>
-      <img class='head-img' :src='item.userAvatarUrl'
+      <img v-if="item.anonymous==0" class='head-img' :src='item.userAvatarUrl'
            @click.stop='goAuthorPage' :data-userid="item.userId">
+      <img v-if="item.anonymous==1" class='head-img' :src='item.userAvatarUrl'
+           :data-userid="item.userId">
       <div class='info'>
         <span class="name">{{item.userName}}</span>
+
         <span class='time'>{{formatCreateAt}}</span>
       </div>
-      <span class="top" v-if="item.top">置顶</span>
+      <span class="top">
+              <img class="ellipsis" src="../../static/ellipsis.png"
+                   :data-postid="item.postId"
+                   @click.stop="loadActions($event)"/>
+      </span>
     </div>
     <div class='body'>
       <pre>{{formatContent}}</pre>
@@ -21,6 +28,7 @@
 
 <script>
   import { passTime } from '../utils/index'
+  import { api } from '../const'
 
   export default {
     props: {
@@ -30,6 +38,12 @@
         default: false,
         type: Boolean
       }
+    },
+    data: {
+      return: {
+      }
+    },
+    onload () {
     },
     computed: {
       formatLastReply () {
@@ -56,6 +70,61 @@
         wx.navigateTo({
           url: `../detail/main?postId=${this.item.postId}`
         })
+      },
+      loadActions (e) {
+        var that = this
+        var t = wx.getStorageSync('t')
+        var currentUserId = wx.getStorageSync('userId')
+        var itemList=[]
+        if(currentUserId==this.item.userId){
+          itemList=['删除','收藏']
+        }else{
+          itemList=['收藏']
+        }
+
+        wx.showActionSheet({
+          itemList:itemList,
+          success: function (res) {
+
+            if(itemList.length==2&&res.tapIndex==0){
+              wx.showModal({
+                title: '删除',
+                content: '请确认此贴是否删除',
+                success (res) {
+                  if (res.confirm) {
+                    that.$http.get(`${api}`, {
+                      act: 'post.delete',
+                      t: t,
+                      postId: that.item.postId
+                    }).then(function (res) {
+                      if (res.data.code != null) {
+                      }
+                      wx.showToast({
+                        title: '成功',
+                        icon: 'success',
+                        duration: 2000,
+                        success: function () {
+                          that.$emit('reloadCardList')
+                        }
+                      })
+                    })
+
+                  } else if (res.cancel) {
+                  }
+                }
+              })
+            }else{
+              // 收藏
+            }
+          },
+          fail: function (res) {
+            // console.log(res.errMsg)
+          }
+        })
+
+        // const postId = e.currentTarget.dataset.postid
+        // this.$emit("showActionModal", postId)
+
       }
     }
   }
@@ -97,6 +166,10 @@
         position: absolute;
         right: 40rpx;
         color: red;
+        .ellipsis {
+          width: 50rpx;
+          height: 75rpx;
+        }
       }
     }
     .body {

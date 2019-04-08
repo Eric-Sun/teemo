@@ -1,15 +1,18 @@
 <template>
   <div class='container'>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
-               :postId='postId' :replyId='replyId' :replyUserName='replyUserName'></sendReply>
+               :postId='postId' :replyId='replyId' :postAnonymous='postAnonymous'
+               :isPostUserId='isPostUserId' :replyUserName='replyUserName'></sendReply>
     <div>
       <scroll-view scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
                    @scrolltolower='getMore'>
         <div class='head'>
-          <img class='head-img' :src='reply.userAvatarUrl'
+          <img v-if="anonymous==0" class='head-img' :src='reply.userAvatarUrl'
                @click.stop='goAuthorPage'>
+          <img v-if="anonymous==1" class='head-img' :src='reply.userAvatarUrl'
+          >
           <div class='info'>
-            <span>{{reply.userName}}</span>
+            <span >{{reply.userName}}</span>
             <span class='time'>{{formatCreateAt}}</span>
             <div class='content'>
               {{reply.content}}
@@ -24,13 +27,16 @@
                  :data-id='item.id'>
               <div class="reply-container">
                 <div class='reply-head'>
-                  <img class='head-img' :src='item.userAvatarUrl'
+                  <img v-if="anonymous==0" class='head-img' :src='item.userAvatarUrl'
                        @click.stop='goAuthorPage'/>
+                  <img v-if="anonymous==1" class='head-img' :src='item.userAvatarUrl'
+                       />
                 </div>
                 <div class="reply-info">
                   <span>{{item.userName}}</span>
                   <div class='reply-content'>
-                    {{item.lastReplyId!=reply.replyId?'回复@'+item.lastReplyUserName+':'+item.content:item.content}}
+                    {{item.lastReplyId!=reply.replyId?
+                    '回复@'+item.lastReplyUserName+':'+item.content:item.content}}
                   </div>
                   <div class="reply-foot">
                     <div class="time">
@@ -112,6 +118,8 @@
         // }
       },
       showReplyModal (e) {
+        var userId = wx.getStorageSync('userId')
+
         const userName = e.currentTarget.dataset.username
         const replyId = e.currentTarget.dataset.replyid
         if (userName) {
@@ -119,7 +127,9 @@
         } else {
           this.content = ''
         }
-
+        if (userId == this.postUserId) {
+          this.isPostUserId = true
+        }
         this.replyId = replyId
         this.replyUserName = userName
         this.sendVisible = true
@@ -142,6 +152,10 @@
     onLoad () {
       this.currentReplyId = this.$root.$mp.query.replyId
       this.postId = this.$root.$mp.query.postId
+      this.postAnonymous = this.$root.$mp.query.anonymous
+      this.postUserId = this.$root.$mp.query.postUserId
+      console.log("postUserId="+this.postUserId)
+      console.log("postAnonymous="+this.postAnonymous)
     }
     ,
     data () {
@@ -151,7 +165,10 @@
         replyId: 0,
         top: 0,
         currentReplyId: 0,
-        postId: 0
+        postId: 0,
+        postAnonymous: 0,
+        postUserId:0,
+        isPostUserId:false
       }
     }
   }
@@ -185,7 +202,7 @@
           text-align: justify;
           text-justify: inter-ideograph;
           margin-bottom: 20rpx;
-          margin-right:25rpx;
+          margin-right: 25rpx;
           font-size: $content-font-size;
         }
       }
@@ -212,7 +229,7 @@
 
         }
         .reply-container-with-divide {
-          display:flex;
+          display: flex;
           flex-direction: column;
           .reply-container {
             display: flex;

@@ -1,17 +1,17 @@
 <template>
   <div class='container'>
     <authorHead :user='user'></authorHead>
-    <!--<div class='body'>-->
-      <!--<div class='tabs'>-->
+    <div class='body'>
+      <div class='tabs'>
         <!--<div :class='{selected:tab==="reply"}' @click.stop='changeTab($event)' data-tab='reply'>最近回复</div>-->
         <!--<div :class='{selected:tab==="topics"}' @click.stop='changeTab($event)' data-tab='topics'>最近主题</div>-->
-      <!--</div>-->
-      <!--<div>-->
-        <!--<div v-for='item in currentData' :key='item.id' :data-id='item.id'>-->
-          <!--<card :item='item' :hidden='true'></card>-->
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
+      </div>
+      <div>
+        <div v-for='item in currentData' :key='item.id' :data-id='item.id'>
+          <card :item='item' :hidden='true'></card>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>

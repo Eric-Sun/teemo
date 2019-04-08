@@ -1,18 +1,21 @@
 <template>
   <div class='container'>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
-               :postId='id' :replyId='replyId' :replyUserName='replyUserName'></sendReply>
+               :postId='id' :replyId='replyId' :isPostUserId='isPostUserId'
+               :postAnonymous='postAnonymous' :replyUserName='replyUserName'></sendReply>
     <div>
       <div class='head'>
-        <img class='head-img' :src='detailData.userAvatarUrl'
+        <img v-if="detailData.anonymous==0" class='head-img' :src='detailData.userAvatarUrl'
              @click.stop='goAuthorPage'>
+        <img v-if="detailData.anonymous==1" class='head-img' :src='detailData.userAvatarUrl'
+        >
         <div class='info'>
           <span>{{detailData.userName}}</span>
           <span class='time'>{{formatCreateAt}}</span>
         </div>
       </div>
 
-      <scroll-view class='body' scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
+      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
                    @scrolltolower='getMore'>
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
@@ -26,29 +29,43 @@
 
           <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
             <div class='reply-head'>
-              <img class='head-img' :src='item.userAvatarUrl'
+              <img v-if="detailData.anonymous==0" class='head-img' :src='item.userAvatarUrl'
                    @click.stop='goAuthorPage'/>
+              <img v-if="detailData.anonymous==1" class='head-img' :src='item.userAvatarUrl'
+              />
             </div>
             <div class="reply-info">
-              <span>{{item.userName}}</span>
+              <span>  {{item.userName}}</span>
               <div class='reply-content'>
                 {{item.content}}
               </div>
-              <div class="reply-replyList-div" v-if="item.replyList.length!=0">
+              <div class="reply-replyList-div"
+                   @click.stop="navigateToReply"
+                   :data-replyid="item.replyId"
+                   :data-postid="id"
+                   :data-anonymous="detailData.anonymous"
+                   v-if="item.replyList.length!=0">
                 <div class="reply-replyList" v-for="(innerItem,innerIndex) in item.replyList" :key='innerItem.replyId'>
                   <div class="reply-replyList-line">
 
                     <div class="reply-replyList-content">
-                      <span class="reply-replyList-name">{{innerItem.userName}}</span>:{{innerItem.lastReplyId!=item.replyId?'回复@'+innerItem.lastReplyUserName+':'+innerItem.content:innerItem.content}}
+                      <span class="reply-replyList-name">{{innerItem.userName}}</span>
+
+                      <span>:{{innerItem.lastReplyId!=item.replyId?
+                      '回复@'+innerItem.lastReplyUserName
+                      +':'+innerItem.content:innerItem.content}}</span>
                     </div>
                   </div>
 
                 </div>
                 <div class="reply-replyList-tips" v-if="item.replySize>1"
                      @click.stop="navigateToReply($event)"
-                     :data-replyid="item.replyId" :data-postid="id">一共{{item.replySize}}条回复
+                     :data-replyid="item.replyId"
+                     :data-postid="id"
+                     :data-anonymous="detailData.anonymous">一共{{item.replySize}}条回复
                 </div>
               </div>
+              <img class='up-png' src="/static/go-bottom.png" mode='widthFix' @click.stop="goBottom">
 
               <div class="reply-foot">
                 <div class="time">
@@ -56,7 +73,10 @@
                 </div>
                 <div class="action">
                   <img class="item"
-                       :data-username="item.userName" :data-replyid='item.replyId' @click.stop="showReplyModal($event)"
+                       :data-username="item.userName"
+                       :data-replyid='item.replyId'
+                       :data-anonymous="detailData.anonymous"
+                       @click.stop="showReplyModal($event)"
                        src="../../../static/comment.png"/>
                 </div>
               </div>
@@ -85,6 +105,7 @@
 
   const debounceOnScroll = () => debounce(function (e) {
     this.top = e.target.scrollTop
+
   })
   export default {
     components: {
@@ -111,9 +132,11 @@
       navigateToReply (e) {
         var replyId = e.currentTarget.dataset.replyid
         var postId = e.currentTarget.dataset.postid
+        var anonymous = e.currentTarget.dataset.anonymous
+        var postUserId = this.detailData.userId
 
         wx.navigateTo({
-          url: `../reply/main?replyId=${replyId}&postId=${postId}`
+          url: `../reply/main?replyId=${replyId}&postId=${postId}&anonymous=${anonymous}&postUserId=${postUserId}`
         })
       },
       onScroll: debounceOnScroll(),
@@ -171,20 +194,20 @@
           this.detailData.is_collect = true
         }
       },
-      goTop () {
-        // console.log(11);
-        this.top = 0
+      goBottom () {
+        this.top = this.currentReplies.length * 1000
       },
       getMore () {
-        if (this.remainReplies.length > 0) {
-          this.currentReplies.concat(this.remainReplies.splice(0, 10))
-        } else {
-          wx.showToast({
-            title: '无更多数据',
-            icon: 'none',
-            duration: 2000
-          })
-        }
+        console.log('aaa')
+        // if (this.remainReplies.length > 0) {
+        //   this.currentReplies.concat(this.remainReplies.splice(0, 10))
+        // } else {
+        //   wx.showToast({
+        //     title: '无更多数据',
+        //     icon: 'none',
+        //     duration: 2000
+        //   })
+        // }
       },
       async upOrCancel (e) {
         // / todo 防抖
@@ -234,14 +257,20 @@
         }
       },
       showReplyModal (e) {
-        const userName = e.currentTarget.dataset.username
-        const replyId = e.currentTarget.dataset.replyid
+        var userId = wx.getStorageSync('userId')
+        var userName = e.currentTarget.dataset.username
+        var replyId = e.currentTarget.dataset.replyid
+        var postAnonymous = this.detailData.anonymous
         if (userName) {
           this.content = `@${userName}:`
         } else {
           this.content = ''
         }
-
+        if (userId == this.detailData.userId) {
+          this.isPostUserId = true
+        }
+        console.log('postAnonymous=' + postAnonymous)
+        this.postAnonymous = postAnonymous
         this.replyId = replyId
         this.replyUserName = userName
         this.sendVisible = true
@@ -277,7 +306,10 @@
         replyId: '',
         top: 0,
         timer: null,
-        replyUserName: ''
+        replyUserName: '',
+        isPostUserId: false, //默认为不相同
+        postAnonymous: 0,
+        bottom: 0
       }
     }
   }
@@ -308,6 +340,8 @@
       }
     }
     .body {
+      height: 90vh;
+      width: 100vw;
       .title {
         background-color: white;
         padding-left: 30rpx;
@@ -321,7 +355,7 @@
         text-justify: inter-ideograph;
         font-weight: normal;
         padding-left: 30rpx;
-        padding-right:30rpx;
+        padding-right: 30rpx;
         font-size: $content-font-size;
       }
 

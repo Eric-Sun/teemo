@@ -37,11 +37,11 @@
       return {
         type: {
           pickerData: ['故事贴', '一日一记'],
-          index: -1
+          index: 0
         },
         anon: {
           pickerData: ['非匿名', '匿名'],
-          index: -1
+          index: 0
         },
         title: '',
         content: '',
@@ -63,6 +63,7 @@
         this.tab = e.target.dataset.tab
       },
       async handle () {
+        var that = this;
         if (this.type.index == -1) {
           wx.showToast({
             title: '请选择类型',
@@ -94,6 +95,11 @@
               title: '发帖成功',
               icon: 'none',
               duration: 2000
+            })
+            that.title=''
+            that.content=''
+            wx.switchTab({
+              url: `../index/main`
             })
           }
         })

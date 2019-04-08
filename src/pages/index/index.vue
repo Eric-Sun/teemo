@@ -46,7 +46,7 @@
       login
     },
 
-    mounted () {
+    onShow () {
       var t = wx.getStorageSync('t')
       var that = this
       this.$http.get(`${api}`,

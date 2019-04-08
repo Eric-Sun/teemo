@@ -2,7 +2,6 @@
   <div class='header'>
     <img :src='user&&user.avatarUrl' class='img'>
     <span class='span'>{{user&&user.nickName}}</span>
-    <span class='span'>{{user&&user.anonNickName}}</span>
     <span class='span'>C龄:{{user&&formatCreateAt}}</span>
   </div>
 </template>

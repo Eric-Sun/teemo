@@ -46,6 +46,7 @@
                     console.log('err=' + response.data.code)
                   } else {
                     wx.setStorageSync('t',response.data.t);
+                    wx.setStorageSync('userId',response.data.userId)
                     that.$emit("modalClose");
                   }
                 })
