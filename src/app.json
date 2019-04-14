@@ -31,6 +31,12 @@
         "selectedIconPath": "static/edit.png"
       },
       {
+        "pagePath": "pages/notice/main",
+        "text": "通知",
+        "iconPath": "static/edit.png",
+        "selectedIconPath": "static/edit.png"
+      },
+      {
         "pagePath": "pages/me/main",
         "text": "我",
         "iconPath": "static/user-o.png",

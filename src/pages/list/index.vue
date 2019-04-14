@@ -8,7 +8,7 @@
   </div>
 </template>
 <script>
-  import { api } from '../../const'
+  import { api,barId } from '../../const'
   import card from '../../components/card'
   import bottomAction from '../../components/bottomAction'
 
@@ -69,7 +69,7 @@
           this.$http.get(`${api}`, {
             act: 'post.recentlyPostList',
             t: this.t,
-            barId: 1,
+            barId: `${barId}`,
             pageNum: 0,
             size: 10
           })
@@ -83,7 +83,7 @@
           this.$http.get(`${api}`, {
             act: 'post.recentlyReplyList',
             t: this.t,
-            barId: 1,
+            barId: `${barId}`,
             pageNum: 0,
             size: 10
           })
