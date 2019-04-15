@@ -108,6 +108,7 @@
       //   })
       // },
       async getData (tab, page) {
+
         var type = -1
         if (tab == 'story') {
           type = 0
@@ -146,6 +147,13 @@
             duration: 2000
           })
         }
+        if (res.data.noticeSize > 0) {
+          wx.setTabBarBadge({
+            index: 2,
+            text: res.data.noticeSize + ''
+          })
+        }
+
         this.isLoading = false
       },
       async getMore () {

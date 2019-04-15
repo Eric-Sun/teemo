@@ -16,7 +16,7 @@
       </div>
 
       <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
-                   @scrolltolower='getMore'>
+      >
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
         </div>
@@ -25,7 +25,12 @@
         </div>
 
         <div class='reply'>
-          <div class="reply-title">评论 {{formatReplies.length}}</div>
+          <div class="reply-title">
+            <div class="reply-length">评论 {{formatReplies.length}}</div>
+            <div class="change-reply-search-type" @click.stop="getSearchTypeActionSheet">
+              {{replySearchType==0?'按时间正序':'按时间倒序'}}
+            </div>
+          </div>
 
           <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
             <div class='reply-head'>
@@ -83,6 +88,12 @@
               <div class="reply-divide"></div>
             </div>
           </div>
+          <div v-if="canGetMoreReply" class="get-more-tips" @click.stop="getMore">
+            获取更多评论
+          </div>
+          <div v-if="!canGetMoreReply" class="get-more-tips">
+            已经没有更多评论了
+          </div>
         </div>
       </scroll-view>
     </div>
@@ -112,7 +123,8 @@
       sendReply
     },
     mounted () {
-      this.getData()
+      this.getPostData()
+      this.getReplyData()
     },
     computed: {
       formatCreateAt () {
@@ -129,6 +141,26 @@
     },
 
     methods: {
+      getSearchTypeActionSheet () {
+        var that = this
+        var itemList = ['按时间正序', '按时间倒序']
+
+        wx.showActionSheet({
+          itemList: itemList,
+          success: function (res) {
+            if (that.replySearchType != res.tapIndex) {
+              that.replySearchType = res.tapIndex
+              if (that.replySearchType == 0) {
+                that.requestAction = 'reply.list'
+              } else {
+                that.requestAction = 'reply.reverseList'
+              }
+              that.getReplyData()
+            }
+
+          }
+        })
+      },
       navigateToReply (e) {
         var replyId = e.currentTarget.dataset.replyid
         var postId = e.currentTarget.dataset.postid
@@ -140,7 +172,7 @@
         })
       },
       onScroll: debounceOnScroll(),
-      async getData () {
+      async getPostData () {
         const accesstoken = wx.getStorageSync('accesstoken')
         //this.id = wx.getStorageSync("topicid");
         wx.showLoading({
@@ -150,14 +182,23 @@
           act: 'post.detail',
           postId: this.id
         })
-        wx.hideLoading()
         this.detailData = res.data
+
+        wx.hideLoading()
+
+      },
+      async getReplyData () {
         const res2 = await this.$http.get(`${api}`, {
-          act: 'reply.list',
-          pageNum: 0,
+          act: this.requestAction,
+          pageNum: this.pageNum,
           size: 10,
           postId: this.id
         })
+        if (res2.data.data.length < 10) {
+          this.canGetMoreReply = false
+        } else {
+          this.pageNum++
+        }
         this.currentReplies = res2.data.data
 
       },
@@ -197,17 +238,25 @@
       goBottom () {
         this.top = this.currentReplies.length * 1000
       },
-      getMore () {
-        console.log('aaa')
-        // if (this.remainReplies.length > 0) {
-        //   this.currentReplies.concat(this.remainReplies.splice(0, 10))
-        // } else {
-        //   wx.showToast({
-        //     title: '无更多数据',
-        //     icon: 'none',
-        //     duration: 2000
-        //   })
-        // }
+      async getMore () {
+        wx.showLoading({
+          title: '加载中'
+        })
+        const res2 = await this.$http.get(`${api}`, {
+          act: this.requestAction,
+          pageNum: this.pageNum,
+          size: 10,
+          postId: this.id
+        })
+        console.log('get more size=' + res2.data.data.length)
+        if (res2.data.data.length < 10) {
+          this.canGetMoreReply = false
+        } else {
+          this.pageNum++
+        }
+        this.currentReplies = [...this.currentReplies, ...res2.data.data]
+
+        wx.hideLoading()
       },
       async upOrCancel (e) {
         // / todo 防抖
@@ -283,6 +332,8 @@
           duration: 1500
 
         })
+        this.pageNum = 0
+        console.log('reset the pageNum=0')
         this.getData()
       },
       closeModal () {
@@ -293,6 +344,10 @@
     onLoad () {
       this.id = this.$root.$mp.query.postId
       console.log('postId=' + this.id)
+    },
+    onShow () {
+      this.pageNum = 0
+      console.log('reset the pageNum=0')
     }
     ,
     data () {
@@ -309,7 +364,11 @@
         replyUserName: '',
         isPostUserId: false, //默认为不相同
         postAnonymous: 0,
-        bottom: 0
+        bottom: 0,
+        pageNum: 0,
+        canGetMoreReply: true,
+        replySearchType: 0, //回帖的排序规则，默认正序
+        requestAction: 'reply.list'
       }
     }
   }
@@ -362,16 +421,33 @@
       .reply {
         background-color: white;
         margin-bottom: 20rpx;
-        .reply-title {
-          font-size: 30rpx;
-          margin-bottom: 20rpx;
-          margin-left: 25rpx;
-          font-weight: lighter;
 
+        .get-more-tips {
+          text-align: center;
+          padding-bottom: 50rpx;
+        }
+
+        .reply-title {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          .reply-length {
+            font-size: 30rpx;
+            margin-bottom: 20rpx;
+            margin-left: 25rpx;
+            font-weight: lighter;
+          }
+          .change-reply-search-type {
+            font-size: 30rpx;
+            margin-bottom: 20rpx;
+            margin-left: 25rpx;
+            font-weight: lighter;
+          }
         }
 
         .reply-container {
           display: flex;
+
           .reply-head {
             margin-left: 25rpx;
             .head-img {
@@ -453,6 +529,7 @@
               }
             }
           }
+
         }
 
       }

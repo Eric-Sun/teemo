@@ -1,7 +1,6 @@
 <template>
   <div class='container'>
     <div>
-      <button class='read-all' @click.stop='readAll'>一键已读</button>
       <div class='notice' v-for='item in formatNoticeList' :key='item.id' :data-id='item.id'>
         <div class='head'>
           <img class='head-img' :src='item.fromUserAvatarImgUrl'
@@ -62,40 +61,43 @@
     onShow () {
       this.t = wx.getStorageSync('t')
       this.getData()
+      this.readAllNotices()
     },
     methods: {
+      async readAllNotices () {
+        const res = await
+          this.$http.get(`${api}`, {
+            t: this.t,
+            act: 'notice.readAll'
+          })
+        if (res.data.code == null) {
+          wx.removeTabBarBadge({
+            index: 2
+          })
+        }
+      },
       goPostDetail (e) {
         const postId = e.currentTarget.dataset.postid
         wx.navigateTo({
           url: `../detail/main?postId=` + postId
-      })
-      },
-      async readAll () {
-        const accesstoken = wx.getStorageSync('accesstoken')
-        const res = await this.$http.post(`${api}/message/mark_all`, {
-          accesstoken
         })
-        if (res.data.success) {
-          wx.showToast({
-            title: '全部已读成功',
-            icon: 'none',
-            duration: 2000
-          })
-        }
-      },
+      }
+      ,
       goDetail (e) {
         wx.navigateTo({
           url: `../detail/main?topicid=${e.target.dataset.topicid}`
         })
-      },
+      }
+      ,
       async getData () {
         var that = this
-        const res = await this.$http.get(`${api}`, {
-          act: 'notice.list',
-          t: this.t,
-          pageNum: 0,
-          size: 10
-        })
+        const res = await
+          this.$http.get(`${api}`, {
+            act: 'notice.list',
+            t: this.t,
+            pageNum: 0,
+            size: 10
+          })
         if (res.data.code == null) {
           console.log(res.data.list)
           that.noticeList = res.data.list
@@ -181,18 +183,6 @@
           }
         }
       }
-    }
-    .read-all {
-      color: $color;
-      border: 2rpx solid $color;
-      font-size: 20rpx;
-      width: 99rpx;
-      border-radius: 20rpx;
-      height: 46rpx;
-      line-height: 46rpx;
-      text-align: center;
-      padding: 0;
-      margin: 10rpx;
     }
   }
 
