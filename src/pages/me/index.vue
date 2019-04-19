@@ -29,7 +29,6 @@
     },
     methods: {
       setListFrom (e) {
-        // e.target.dataset.item
         wx.setStorageSync('fromItem', e.target.dataset.item)
       },
       closeModalEvent () {

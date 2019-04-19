@@ -40,8 +40,7 @@
       }
     },
     data: {
-      return: {
-      }
+      return: {}
     },
     onload () {
     },
@@ -61,10 +60,18 @@
     },
     methods: {
       goAuthorPage (e) {
-        // e.currentTarget.dataset.author
-        wx.navigateTo({
-          url: `../user/main?userId=${e.currentTarget.dataset.userid}`
-        })
+
+        const cachedUserId = wx.getStorageSync('userId')
+        const cardUserId = e.currentTarget.dataset.userid
+        if (cachedUserId == cardUserId) {
+          wx.switchTab({
+            url: `/pages/me/main`
+          })
+        } else {
+          wx.navigateTo({
+            url: `../user/main?otherUserId=${cardUserId}`
+          })
+        }
       },
       goDetail () {
         wx.navigateTo({
@@ -75,18 +82,18 @@
         var that = this
         var t = wx.getStorageSync('t')
         var currentUserId = wx.getStorageSync('userId')
-        var itemList=[]
-        if(currentUserId==this.item.userId){
-          itemList=['删除','收藏']
-        }else{
-          itemList=['收藏']
+        var itemList = []
+        if (currentUserId == this.item.userId) {
+          itemList = ['删除', '收藏']
+        } else {
+          itemList = ['收藏']
         }
 
         wx.showActionSheet({
-          itemList:itemList,
+          itemList: itemList,
           success: function (res) {
 
-            if(itemList.length==2&&res.tapIndex==0){
+            if (itemList.length == 2 && res.tapIndex == 0) {
               wx.showModal({
                 title: '删除',
                 content: '请确认此贴是否删除',
@@ -113,7 +120,7 @@
                   }
                 }
               })
-            }else{
+            } else {
               // 收藏
             }
           },

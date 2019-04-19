@@ -68,6 +68,7 @@
     methods: {
       closeModalEvent () {
         this.visible = false
+        this.t = wx.getStorageSync('t')
         this.getData('story', 0)
       },
 

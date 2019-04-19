@@ -8,7 +8,7 @@
   </div>
 </template>
 <script>
-  import { api,barId } from '../../const'
+  import { api, barId } from '../../const'
   import card from '../../components/card'
   import bottomAction from '../../components/bottomAction'
 
@@ -19,7 +19,8 @@
         t: 0,
         bottomActionVisible: false,
         deletedPostId: 0,
-        from: 0
+        type: '',
+        otherUserId: 0
       }
     },
     components: {
@@ -27,8 +28,10 @@
       bottomAction
     },
     onLoad (options) {
-      this.from = options.type
+      this.type = options.type
+      console.log('type=' + this.type)
       this.t = wx.getStorageSync('t')
+      this.otherUserId = options.otherUserId
       this.loadData()
 
     },
@@ -36,7 +39,7 @@
       loadData () {
         var that = this
         // from 最近话题 最近回复
-        switch (that.from) {
+        switch (that.type) {
           case 'topic':
             this.getRecentlyPost()
             wx.setNavigationBarTitle({
@@ -44,11 +47,18 @@
             })
             break
           case 'reply':
-            this.recentlyReplyList(from)
+            this.recentlyReplyList()
             wx.setNavigationBarTitle({
               title: '最近回复'
             })
             break
+          case 'otherUserTopic':
+            this.getOtherUserPostList()
+            wx.setNavigationBarTitle({
+              title: '最近回复'
+            })
+            break
+
         }
       }
       ,
@@ -70,6 +80,21 @@
             act: 'post.recentlyPostList',
             t: this.t,
             barId: `${barId}`,
+            pageNum: 0,
+            size: 10
+          })
+        if (res.data.code == null) {
+          this.currentData = res.data.list
+        }
+      },
+
+      async getOtherUserPostList () {
+        const res = await
+          this.$http.get(`${api}`, {
+            act: 'post.recentlyOtherUserPostList',
+            t: this.t,
+            barId: `${barId}`,
+            otherUserId:this.otherUserId,
             pageNum: 0,
             size: 10
           })
