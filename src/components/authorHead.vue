@@ -6,18 +6,18 @@
   </div>
 </template>
 <script>
-  import { passTime } from '../utils/index'
+  import {passTime} from '../utils/index'
 
   export default {
     props: {
       user: Object
     },
     computed: {
-      formatCreateAt () {
+      formatCreateAt() {
         return passTime(this.user && this.user.createtime).slice(0, -1)
       }
     },
-    mounted () {
+    mounted() {
     }
   }
 </script>
@@ -30,12 +30,14 @@
     color: $color;
     font-size: 30rpx;
     background-color: white;
+
     .img {
       width: 200rpx;
       height: 200rpx;
       border-radius: 50%;
       margin-top: 30rpx;
     }
+
     .span {
       margin-top: 20rpx;
     }

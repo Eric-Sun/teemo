@@ -7,7 +7,7 @@
 </template>
 
 <script>
-  import { api } from '../const'
+  import {api} from '../const'
 
   export default {
     props: {
@@ -27,21 +27,21 @@
       this.t = wx.getStorageSync('t')
     },
     methods: {
-      closeModal () {
+      closeModal() {
         this.$emit('close-modal')
       },
-      async deletePost () {
+      async deletePost() {
         var that = this;
         wx.showModal({
           title: '删除',
           content: '请确认此贴是否删除',
-          success (res) {
+          success(res) {
             if (res.confirm) {
               that.$http.get(`${api}`, {
                 act: 'post.delete',
                 t: that.t,
                 postId: that.postId
-              }).then(function(res){
+              }).then(function (res) {
                 if (res.data.code != null) {
                 }
                 wx.showToast({
@@ -72,6 +72,7 @@
     position: fixed;
     z-index: 3;
     background-color: rgba(0, 0, 0, 0.6);
+
     .container {
       display: flex;
       flex-direction: column;
@@ -82,6 +83,7 @@
       width: 100%;
       box-sizing: border-box;
       padding: 10px;
+
       .delete {
         text-align: center;
         width: 100%;

@@ -11,6 +11,8 @@
 	"compileType": "miniprogram",
 	"appid": "wxaa4fd4f99543a61a",
 	"projectname": "teemo",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
 	"condition": {
 		"search": {
 			"current": -1,

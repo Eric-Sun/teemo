@@ -27,8 +27,8 @@
 </template>
 
 <script>
-  import { passTime } from '../utils/index'
-  import { api } from '../const'
+  import {passTime} from '../utils/index'
+  import {api} from '../const'
 
   export default {
     props: {
@@ -42,16 +42,16 @@
     data: {
       return: {}
     },
-    onload () {
+    onload() {
     },
     computed: {
-      formatLastReply () {
+      formatLastReply() {
         return passTime(this.item.createtime)
       },
-      formatCreateAt () {
+      formatCreateAt() {
         return passTime(this.item.createtime)
       },
-      formatContent () {
+      formatContent() {
         // var reg = new RegExp('\n\n', 'g')
         // console.log( this.item.content.replace(reg,`<br>`))
         // return this.item.content.replace(reg,`<br>`)
@@ -59,7 +59,7 @@
       }
     },
     methods: {
-      goAuthorPage (e) {
+      goAuthorPage(e) {
 
         const cachedUserId = wx.getStorageSync('userId')
         const cardUserId = e.currentTarget.dataset.userid
@@ -73,12 +73,12 @@
           })
         }
       },
-      goDetail () {
+      goDetail() {
         wx.navigateTo({
           url: `../detail/main?postId=${this.item.postId}`
         })
       },
-      loadActions (e) {
+      loadActions(e) {
         var that = this
         var t = wx.getStorageSync('t')
         var currentUserId = wx.getStorageSync('userId')
@@ -97,7 +97,7 @@
               wx.showModal({
                 title: '删除',
                 content: '请确认此贴是否删除',
-                success (res) {
+                success(res) {
                   if (res.confirm) {
                     that.$http.get(`${api}`, {
                       act: 'post.delete',
@@ -146,10 +146,12 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
     .head {
       color: black;
       display: flex;
       align-items: center;
+
       .head-img {
         border-radius: 45rpx;
         width: 75rpx;
@@ -160,30 +162,36 @@
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
+
         .name {
           font-weight: bold;
           font-size: $userName-font-size;
         }
+
         .time {
           font-size: $time-font-size;
           color: $borderColor;
         }
       }
+
       .top {
         position: absolute;
         right: 40rpx;
         color: red;
+
         .ellipsis {
           width: 50rpx;
           height: 75rpx;
         }
       }
     }
+
     .body {
       // color: $color;
       margin-top: 10rpx;
       margin-bottom: 20rpx;
       margin-left: 10rpx;
+
       & > pre {
         white-space: pre-line;
         text-align: justify;
@@ -192,15 +200,18 @@
         font-size: $content-font-size;
       }
     }
+
     .foot {
       display: flex;
       flex-direction: row;
+
       .reply-img {
         margin-left: 20rpx;
         height: 35rpx;
         width: 35rpx;
 
       }
+
       .reply-count {
         margin-left: 10rpx;
         height: 35rpx;
