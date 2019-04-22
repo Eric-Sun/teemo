@@ -21,11 +21,12 @@
 
 <script>
   import card from '@/components/card'
-  import { api, barId } from '../../const'
+  import {api, barId} from '../../const'
   import login from '../../components/login'
+  import {checkT} from '../../utils/net'
 
   export default {
-    data () {
+    data() {
       return {
         t: 0,
         page: 0,
@@ -46,27 +47,23 @@
       login
     },
 
-    onShow () {
+    onShow() {
       var t = wx.getStorageSync('t')
       var that = this
-      this.$http.get(`${api}`,
-        {
-          act: 'user.checkToken',
-          t: t
-        }).then(function (res) {
-        if (res.data.result == 1) {
+      checkT(t,
+        function () {
+          console.log("1111")
           that.visible = true
-        } else {
+        },
+        function () {
+          that.t = wx.getStorageSync('t')
           that.getData('story', 0)
         }
-
-      })
-      this.t = wx.getStorageSync('t')
-
+      );
     },
 
     methods: {
-      closeModalEvent () {
+      closeModalEvent() {
         this.visible = false
         this.t = wx.getStorageSync('t')
         this.getData('story', 0)
@@ -108,7 +105,8 @@
       //     }
       //   })
       // },
-      async getData (tab, page) {
+      async getData(tab, page) {
+        var that =this;
 
         var type = -1
         if (tab == 'story') {
@@ -124,7 +122,7 @@
           this.$http.get(`${api}`,
             {
               act: 'post.list',
-              t: this.t,
+              t: that.t,
               barId: `${barId}`,
               pageNum: page,
               size: 10,
@@ -157,17 +155,17 @@
 
         this.isLoading = false
       },
-      async getMore () {
+      async getMore() {
         if (!this.isLoading) {
           await this.getData(this.tab, this.page + 1)
           this.page += 1
         }
       },
-      async onPullDownRefresh () {
+      async onPullDownRefresh() {
         await this.getData(this.tab, 0)
         wx.stopPullDownRefresh()
       },
-      changeTab (e) {
+      changeTab(e) {
         const currentTab = e.target.dataset.tab
         const offset = e.target.dataset.offset
         this.tab = currentTab
@@ -192,8 +190,10 @@
     font-size: 30rpx;
     overflow: hidden;
     width: 100vw;
+
     .header {
       display: flex;
+
       & > div {
         width: 20%;
         /*background-color: #41b883;*/
@@ -203,9 +203,11 @@
         line-height: 86rpx;
       }
     }
+
     .containers {
       display: flex;
       position: relative;
+
       .scroll-container {
         height: 90vh;
         width: 100vw;
