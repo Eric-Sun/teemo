@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <login :visible='visible' v-on:modalClose='closeModalEvent'></login>
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <div class='list'>
       <span>标题:</span>
       <input class='input' type="text" placeholder="最少10个字" v-model="title">
@@ -22,6 +22,8 @@
   import login from '../../components/login'
   import { api } from '../../const'
   import { barId } from '../../const'
+  import {checkT} from '../../utils/net'
+
 
   export default {
     components: {
@@ -45,7 +47,7 @@
         },
         title: '',
         content: '',
-        visible: false,
+        loginVisible: false,
         tab: 'markdown', // or preview
         t: ''
       }
@@ -111,15 +113,14 @@
       }
     },
     onShow () {
-      this.t = wx.getStorageSync('t')
-      var that = this
-      wx.checkSession({
-        success () {
+      var that = this;
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
         },
-        fail () {
-          that.visible = true
-        }
-      })
+        function () {
+        });
     }
   }
 </script>

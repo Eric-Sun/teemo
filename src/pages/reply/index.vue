@@ -1,5 +1,6 @@
 <template>
   <div class='container'>
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
                :postId='postId' :replyId='replyId' :postAnonymous='postAnonymous'
                :isPostUserId='isPostUserId' :replyUserName='replyUserName'></sendReply>
@@ -12,7 +13,7 @@
           <img v-if="anonymous==1" class='head-img' :src='reply.userAvatarUrl'
           >
           <div class='info'>
-            <span >{{reply.userName}}</span>
+            <span>{{reply.userName}}</span>
             <span class='time'>{{formatCreateAt}}</span>
             <div class='content'>
               {{reply.content}}
@@ -30,7 +31,7 @@
                   <img v-if="anonymous==0" class='head-img' :src='item.userAvatarUrl'
                        @click.stop='goAuthorPage'/>
                   <img v-if="anonymous==1" class='head-img' :src='item.userAvatarUrl'
-                       />
+                  />
                 </div>
                 <div class="reply-info">
                   <span>{{item.userName}}</span>
@@ -62,29 +63,43 @@
 </template>
 
 <script>
-  import { api } from '../../const'
-  import { passTime, debounce } from '../../utils'
+  import {api} from '../../const'
+  import {passTime, debounce} from '../../utils'
   import sendReply from '../../components/sendReply'
+  import {checkT} from '../../utils/net'
+  import login from '../../components/login'
+
 
   const debounceOnScroll = () => debounce(function (e) {
     this.top = e.target.scrollTop
   })
   export default {
     components: {
-      sendReply
+      sendReply,
+      login
     },
-    mounted () {
+    mounted() {
       this.getData()
     },
     computed: {
-      formatCreateAt () {
+      formatCreateAt() {
         return passTime(this.reply.createtime)
       }
+    },
+    onShow() {
+      var that = this;
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
+        });
     },
 
     methods: {
       onScroll: debounceOnScroll(),
-      async getData () {
+      async getData() {
         const t = wx.getStorageSync('t')
         wx.showLoading({
           title: '加载中'
@@ -102,11 +117,11 @@
 
       },
 
-      goTop () {
+      goTop() {
         // console.log(11);
         this.top = 0
       },
-      getMore () {
+      getMore() {
         // if (this.remainReplies.length > 0) {
         //   this.currentReplies.concat(this.remainReplies.splice(0, 10))
         // } else {
@@ -117,7 +132,7 @@
         //   })
         // }
       },
-      showReplyModal (e) {
+      showReplyModal(e) {
         var userId = wx.getStorageSync('userId')
 
         const userName = e.currentTarget.dataset.username
@@ -134,7 +149,7 @@
         this.replyUserName = userName
         this.sendVisible = true
       },
-      replySuccess () {
+      replySuccess() {
         this.closeModal()
         wx.showToast({
           title: '评论成功',
@@ -144,21 +159,21 @@
         })
         this.getData()
       },
-      closeModal () {
+      closeModal() {
         this.sendVisible = false
       }
     }
     ,
-    onLoad () {
+    onLoad() {
       this.currentReplyId = this.$root.$mp.query.replyId
       this.postId = this.$root.$mp.query.postId
       this.postAnonymous = this.$root.$mp.query.anonymous
       this.postUserId = this.$root.$mp.query.postUserId
-      console.log("postUserId="+this.postUserId)
-      console.log("postAnonymous="+this.postAnonymous)
+      console.log("postUserId=" + this.postUserId)
+      console.log("postAnonymous=" + this.postAnonymous)
     }
     ,
-    data () {
+    data() {
       return {
         reply: {},
         sendVisible: false,
@@ -167,8 +182,9 @@
         currentReplyId: 0,
         postId: 0,
         postAnonymous: 0,
-        postUserId:0,
-        isPostUserId:false
+        postUserId: 0,
+        isPostUserId: false,
+        loginVisible: false
       }
     }
   }
@@ -178,6 +194,7 @@
   .container {
     /*height: 100vh;*/
     background-color: rgb(245, 245, 239);
+
     .head {
       background-color: white;
       display: flex;
@@ -193,10 +210,12 @@
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
+
         .time {
           font-size: $time-font-size;
           color: $borderColor;
         }
+
         .content {
           white-space: pre-line;
           text-align: justify;
@@ -208,12 +227,15 @@
       }
 
     }
+
     .body {
       padding: 15rpx;
       background-color: rgb(245, 245, 239);
+
       .title {
         /*background-color: white;*/
         padding-left: 30rpx;
+
         .big {
           font-size: 50rpx;
         }
@@ -228,30 +250,37 @@
           font-weight: lighter;
 
         }
+
         .reply-container-with-divide {
           display: flex;
           flex-direction: column;
+
           .reply-container {
             display: flex;
+
             .reply-head {
               margin-left: 25rpx;
+
               .head-img {
                 border-radius: 45rpx;
                 width: 75rpx;
                 height: 75rpx;
               }
             }
+
             .reply-info {
               display: flex;
               flex-direction: column;
               margin-left: 20rpx;
               margin-right: 50rpx;
               width: 100%;
+
               & > span {
                 font-weight: lighter;
                 color: gray;
                 font-size: $reply-content-font-size;
               }
+
               .reply-content {
                 width: 100%;
                 white-space: pre-line;
@@ -268,10 +297,12 @@
                 font-size: 30rpx;
                 font-weight: lighter;
                 margin-right: 50rpx;
+
                 .time {
                   font-size: 25rpx;
                   color: gray;
                 }
+
                 .action {
                   .item {
                     height: 40rpx;
@@ -284,6 +315,7 @@
             }
 
           }
+
           .reply-divide {
             border-bottom: 1px solid #ccc;
             margin-bottom: 20rpx;
@@ -293,6 +325,7 @@
         }
 
       }
+
       .reply-buton {
         border-radius: 50%;
         width: 100rpx;
@@ -306,6 +339,7 @@
         left: 81vw;
         color: white;
       }
+
       .up-png {
         width: 100rpx;
         top: 75vh;

@@ -1,5 +1,6 @@
 <template>
   <div class='container'>
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
                :postId='id' :replyId='replyId' :isPostUserId='isPostUserId'
                :postAnonymous='postAnonymous' :replyUserName='replyUserName'></sendReply>
@@ -110,9 +111,12 @@
 </template>
 
 <script>
-  import { api } from '../../const'
-  import { passTime, debounce } from '../../utils'
+  import login from '../../components/login'
+  import {api} from '../../const'
+  import {passTime, debounce} from '../../utils'
   import sendReply from '../../components/sendReply'
+  import {checkT} from '../../utils/net'
+
 
   const debounceOnScroll = () => debounce(function (e) {
     this.top = e.target.scrollTop
@@ -120,17 +124,18 @@
   })
   export default {
     components: {
-      sendReply
+      sendReply,
+      login
     },
-    mounted () {
+    mounted() {
       this.getPostData()
       this.getReplyData()
     },
     computed: {
-      formatCreateAt () {
+      formatCreateAt() {
         return passTime(this.detailData.createtime)
       },
-      formatReplies () {
+      formatReplies() {
         return this.currentReplies.map(_ => {
           return {
             ..._,
@@ -141,7 +146,7 @@
     },
 
     methods: {
-      getSearchTypeActionSheet () {
+      getSearchTypeActionSheet() {
         var that = this
         var itemList = ['按时间正序', '按时间倒序']
 
@@ -161,7 +166,7 @@
           }
         })
       },
-      navigateToReply (e) {
+      navigateToReply(e) {
         var replyId = e.currentTarget.dataset.replyid
         var postId = e.currentTarget.dataset.postid
         var anonymous = e.currentTarget.dataset.anonymous
@@ -172,9 +177,7 @@
         })
       },
       onScroll: debounceOnScroll(),
-      async getPostData () {
-        const accesstoken = wx.getStorageSync('accesstoken')
-        //this.id = wx.getStorageSync("topicid");
+      async getPostData() {
         wx.showLoading({
           title: '加载中'
         })
@@ -187,7 +190,7 @@
         wx.hideLoading()
 
       },
-      async getReplyData () {
+      async getReplyData() {
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: this.pageNum,
@@ -202,7 +205,7 @@
         this.currentReplies = res2.data.data
 
       },
-      async collect () {
+      async collect() {
         const accesstoken = wx.getStorageSync('accesstoken')
         const topic_id = this.id
         if (this.detailData.is_collect) {
@@ -235,10 +238,10 @@
           this.detailData.is_collect = true
         }
       },
-      goBottom () {
+      goBottom() {
         this.top = this.currentReplies.length * 1000
       },
-      async getMore () {
+      async getMore() {
         wx.showLoading({
           title: '加载中'
         })
@@ -258,7 +261,7 @@
 
         wx.hideLoading()
       },
-      async upOrCancel (e) {
+      async upOrCancel(e) {
         // / todo 防抖
         // console.log(e);
         const accesstoken = wx.getStorageSync('accesstoken')
@@ -305,7 +308,7 @@
           })
         }
       },
-      showReplyModal (e) {
+      showReplyModal(e) {
         var userId = wx.getStorageSync('userId')
         var userName = e.currentTarget.dataset.username
         var replyId = e.currentTarget.dataset.replyid
@@ -324,8 +327,9 @@
         this.replyUserName = userName
         this.sendVisible = true
       },
-      replySuccess () {
+      replySuccess() {
         this.closeModal()
+        var that = this;
         wx.showToast({
           title: '评论成功',
           icon: 'none',
@@ -333,24 +337,31 @@
 
         })
         this.pageNum = 0
-        console.log('reset the pageNum=0')
-        this.getData()
+        that.getReplyData()
       },
-      closeModal () {
+      closeModal() {
         this.sendVisible = false
       }
     }
     ,
-    onLoad () {
+    onLoad() {
       this.id = this.$root.$mp.query.postId
       console.log('postId=' + this.id)
     },
-    onShow () {
+    onShow() {
       this.pageNum = 0
-      console.log('reset the pageNum=0')
+      var that = this;
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
+        }
+      );
     }
     ,
-    data () {
+    data() {
       return {
         detailData: {},
         remainReplies: [],
@@ -368,7 +379,8 @@
         pageNum: 0,
         canGetMoreReply: true,
         replySearchType: 0, //回帖的排序规则，默认正序
-        requestAction: 'reply.list'
+        requestAction: 'reply.list',
+        loginVisible: false
       }
     }
   }
@@ -377,10 +389,12 @@
 <style lang='scss' scoped>
   .container {
     height: 100vh;
+
     .head {
       background-color: white;
       display: flex;
       align-items: center;
+
       .head-img {
         border-radius: 45rpx;
         width: 75rpx;
@@ -392,22 +406,27 @@
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
+
         .time {
           font-size: $time-font-size;
           color: $borderColor;
         }
       }
     }
+
     .body {
       height: 90vh;
       width: 100vw;
+
       .title {
         background-color: white;
         padding-left: 30rpx;
+
         .big {
           font-size: 50rpx;
         }
       }
+
       .content {
         white-space: pre-line;
         text-align: justify;
@@ -431,12 +450,14 @@
           display: flex;
           flex-direction: row;
           justify-content: space-between;
+
           .reply-length {
             font-size: 30rpx;
             margin-bottom: 20rpx;
             margin-left: 25rpx;
             font-weight: lighter;
           }
+
           .change-reply-search-type {
             font-size: 30rpx;
             margin-bottom: 20rpx;
@@ -450,6 +471,7 @@
 
           .reply-head {
             margin-left: 25rpx;
+
             .head-img {
               border-radius: 45rpx;
               width: 75rpx;
@@ -464,11 +486,13 @@
             margin-bottom: 20rpx;
             margin-right: 50rpx;
             width: 100%;
+
             & > span {
               /*font-weight: lighter;*/
               /*color: rgb(245, 245, 239);*/
               font-size: $reply-content-font-size;
             }
+
             .reply-content {
               width: 100%;
               white-space: pre-line;
@@ -477,15 +501,18 @@
               font-weight: normal;
               font-size: $content-font-size;
             }
+
             .reply-foot {
               display: flex;
               justify-content: space-between;
               font-size: 25rpx;
               /*font-weight: lighter;*/
               margin-right: 50rpx;
+
               .time {
                 color: gray;
               }
+
               .action {
                 .item {
                   height: 50rpx;
@@ -494,6 +521,7 @@
                 }
               }
             }
+
             .reply-divide {
               border-bottom: 1px solid #ccc;
               margin-bottom: 20rpx;
@@ -505,13 +533,16 @@
               background-color: rgb(245, 245, 239);
               font-size: $reply-content-font-size;
               padding: 15rpx;
+
               .reply-replyList {
                 .reply-replyList-line {
                   display: flex;
                   flex-direction: row;
+
                   .reply-replyList-name {
                     color: dodgerblue;
                   }
+
                   .reply-replyList-content {
                     width: 100%;
                     white-space: pre-line;
@@ -523,6 +554,7 @@
 
                 }
               }
+
               .reply-replyList-tips {
                 display: flex;
                 color: dodgerblue;
@@ -533,6 +565,7 @@
         }
 
       }
+
       .reply-buton {
         border-radius: 50%;
         width: 100rpx;
@@ -546,6 +579,7 @@
         left: 81vw;
         color: white;
       }
+
       .up-png {
         width: 100rpx;
         top: 75vh;
@@ -567,14 +601,17 @@
     background-color: white;
     display: flex;
     justify-content: space-between;
+
     .group1 {
       display: flex;
       margin-right: 20rpx;
+
       .comment {
         height: 50rpx;
         width: 50rpx;
         margin: 25rpx;
       }
+
       .praise {
         height: 50rpx;
         width: 50rpx;
@@ -582,6 +619,7 @@
       }
 
     }
+
     .share {
       margin: 25rpx;
       height: 50rpx;

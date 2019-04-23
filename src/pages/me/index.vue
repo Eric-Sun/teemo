@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <login :visible='visible' v-on:modalClose='closeModalEvent'></login>
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <authorHead :user='user'></authorHead>
     <div class='list'>
       <!--<navigator class='list-item' @click.stop='setListFrom' url='/pages/list/main?type=collect' data-item='collect'>我的收藏</navigator>-->
@@ -11,15 +11,15 @@
 </template>
 
 <script>
-  import { getURL } from '../../utils/index'
   import authorHead from '../../components/authorHead'
-  import login from '../../components/login'
   import { api } from '../../const'
-
+  import {checkT} from '../../utils/net'
+  import login from '../../components/login'
+  
   export default {
     data () {
       return {
-        visible: false,
+        loginVisible: false,
         user: {}
       }
     },
@@ -47,21 +47,17 @@
         }
       }
     },
-    mounted () {
+    onShow () {
       var that = this
-      var t = wx.getStorageSync('t')
-      this.$http.get(`${api}`,
-        {
-          act: 'user.checkToken',
-          t: t
-        }).then(function (res) {
-        if (res.data.result == 1) {
-          that.visible = true;
-        } else {
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
           that.getData()
         }
-
-      })
+      );
     }
   }
 </script>

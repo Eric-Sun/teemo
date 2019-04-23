@@ -52,7 +52,6 @@
       var that = this
       checkT(t,
         function () {
-          console.log("1111")
           that.visible = true
         },
         function () {

@@ -1,5 +1,6 @@
 <template>
   <div class="container">
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <!--<bottomAction v-if="bottomActionVisible" @close-modal="closeModal" :postId="deletedPostId"></bottomAction>-->
     <div class='margin' v-for='item in currentData' :key='item.id'>
       <card :item='item' :hidden='true' @reloadCardList="reloadCardList" @close-modal='closeModal'></card>
@@ -8,26 +9,32 @@
   </div>
 </template>
 <script>
-  import { api, barId } from '../../const'
+  import {api, barId} from '../../const'
   import card from '../../components/card'
   import bottomAction from '../../components/bottomAction'
+  import {checkT} from '../../utils/net'
+  import login from '../../components/login'
+
+
 
   export default {
-    data () {
+    data() {
       return {
         currentData: [],
         t: 0,
         bottomActionVisible: false,
         deletedPostId: 0,
         type: '',
-        otherUserId: 0
+        otherUserId: 0,
+        loginVisible: false
       }
     },
     components: {
       card,
-      bottomAction
+      bottomAction,
+      login
     },
-    onLoad (options) {
+    onLoad(options) {
       this.type = options.type
       console.log('type=' + this.type)
       this.t = wx.getStorageSync('t')
@@ -35,8 +42,19 @@
       this.loadData()
 
     },
+    onShow() {
+      var that = this;
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
+        }
+      );
+    },
     methods: {
-      loadData () {
+      loadData() {
         var that = this
         // from 最近话题 最近回复
         switch (that.type) {
@@ -70,11 +88,11 @@
       //   this.deletedPostId = data
       //
       // },
-      reloadCardList () {
+      reloadCardList() {
         this.loadData()
       }
       ,
-      async getRecentlyPost () {
+      async getRecentlyPost() {
         const res = await
           this.$http.get(`${api}`, {
             act: 'post.recentlyPostList',
@@ -88,13 +106,13 @@
         }
       },
 
-      async getOtherUserPostList () {
+      async getOtherUserPostList() {
         const res = await
           this.$http.get(`${api}`, {
             act: 'post.recentlyOtherUserPostList',
             t: this.t,
             barId: `${barId}`,
-            otherUserId:this.otherUserId,
+            otherUserId: this.otherUserId,
             pageNum: 0,
             size: 10
           })
@@ -103,7 +121,7 @@
         }
       }
       ,
-      async recentlyReplyList () {
+      async recentlyReplyList() {
         const res = await
           this.$http.get(`${api}`, {
             act: 'post.recentlyReplyList',
@@ -123,6 +141,7 @@
   .container {
     background-color: rgb(245, 245, 249);
     min-height: 100vh;
+
     .margin {
       margin-bottom: 20rpx;
     }

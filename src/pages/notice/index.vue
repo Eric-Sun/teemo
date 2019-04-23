@@ -1,5 +1,7 @@
 <template>
   <div class='container'>
+    <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
+
     <div>
       <div class='notice' v-for='item in formatNoticeList' :key='item.id' :data-id='item.id'>
         <div class='head'>
@@ -39,13 +41,18 @@
 <script>
   import { api } from '../../const'
   import { passTime } from '../../utils/index'
+  import {checkT} from '../../utils/net'
+  import login from '../../components/login'
 
   export default {
-    components: {},
+    components: {
+      login
+    },
     data () {
       return {
         t: 0,
-        noticeList: []
+        noticeList: [],
+        loginVisible:false
       }
     },
     computed: {
@@ -59,9 +66,19 @@
       }
     },
     onShow () {
-      this.t = wx.getStorageSync('t')
-      this.getData()
-      this.readAllNotices()
+      var that = this;
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
+          that.t = wx.getStorageSync('t')
+          that.getData()
+          that.readAllNotices()
+        }
+      );
+   
     },
     methods: {
       async readAllNotices () {
