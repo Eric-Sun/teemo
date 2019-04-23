@@ -14,3 +14,14 @@ export function checkT(t,falseFunction,trueFunction) {
     }
   });
 }
+
+/**
+ * 处理服务端返回的信息，如果有错误的话，会对应的弹出错误框
+ * @param res
+ * @param falseFunction
+ * @param trueFunction
+ */
+export function handleResponse(res,falseFunction,trueFunction){
+
+
+}
