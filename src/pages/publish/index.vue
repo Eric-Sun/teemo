@@ -6,10 +6,10 @@
       <input class='input' type="text" placeholder="最少10个字" v-model="title">
     </div>
     <picker class='picker' @change="bindPickerChange($event)" :value="type.index" :range="type.pickerData">
-      <span>类型:</span><span style='margin-left:400rpx;'>{{type.pickerData[type.index]}}</span>
+      <span>类型:</span><span style='margin-left:200rpx;'>{{type.pickerData[type.index]}}</span>
     </picker>
     <picker class='picker' @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">
-      <span>匿名:</span><span style='margin-left:400rpx;'>{{anon.pickerData[anon.index]}}</span>
+      <span>匿名:</span><span style='margin-left:200rpx;'>{{anon.pickerData[anon.index]}}</span>
     </picker>
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
@@ -131,20 +131,21 @@
     background-color: rgb(245, 245, 249);
     .list {
       display: flex;
-      justify-content: space-between;
+      /*justify-content: space-between;*/
       background-color: white;
       margin-bottom: 30rpx;
       height: 90rpx;
       padding: 0 30rpx;
       line-height: 90rpx;
       .input {
+        margin-left:150rpx;
         height: 90rpx;
         line-height: 90rpx;
       }
     }
     .picker {
       display: flex;
-      justify-content: space-between;
+      /*justify-content: space-between;*/
       background-color: white;
       margin-bottom: 30rpx;
       height: 90rpx;

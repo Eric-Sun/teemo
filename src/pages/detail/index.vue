@@ -423,7 +423,9 @@
         padding-left: 30rpx;
 
         .big {
-          font-size: 50rpx;
+          font-size: 40rpx;
+          font-weight: 900;
+
         }
       }
 
@@ -443,25 +445,27 @@
 
         .get-more-tips {
           text-align: center;
-          padding-bottom: 50rpx;
+          font-size: 30rpx;
+          padding-bottom: 70rpx;
         }
 
         .reply-title {
           display: flex;
           flex-direction: row;
           justify-content: space-between;
+          margin-bottom: 10rpx;
+          margin-top:10rpx;
 
           .reply-length {
             font-size: 30rpx;
-            margin-bottom: 20rpx;
             margin-left: 25rpx;
             font-weight: lighter;
           }
 
           .change-reply-search-type {
             font-size: 30rpx;
-            margin-bottom: 20rpx;
             margin-left: 25rpx;
+            margin-right:20rpx;
             font-weight: lighter;
           }
         }
@@ -507,16 +511,18 @@
               justify-content: space-between;
               font-size: 25rpx;
               /*font-weight: lighter;*/
-              margin-right: 50rpx;
+              margin-right: 10rpx;
+              margin-top: 10rpx;
 
               .time {
                 color: gray;
+                margin-left: 10rpx;
               }
 
               .action {
                 .item {
-                  height: 50rpx;
-                  width: 50rpx;
+                  height: 35rpx;
+                  width: 35rpx;
                   margin-left: 50rpx;
                 }
               }
@@ -524,8 +530,8 @@
 
             .reply-divide {
               border-bottom: 1px solid #ccc;
-              margin-bottom: 20rpx;
-              margin-top: 20rpx;
+              margin-bottom: 10rpx;
+              margin-top: 10rpx;
               margin-right: 20rpx;
             }
 
@@ -545,7 +551,7 @@
 
                   .reply-replyList-content {
                     width: 100%;
-                    white-space: pre-line;
+                    /*white-space: pre-line;*/
                     text-align: justify;
                     text-justify: inter-ideograph;
                     font-size: $reply-content-font-size;

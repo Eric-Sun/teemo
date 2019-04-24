@@ -114,7 +114,7 @@
       bottom: 0;
       width: 100%;
       box-sizing: border-box;
-      padding: 10px;
+      padding: 5px;
       .anonymous {
         display: flex;
         flex-direction: row;
@@ -123,7 +123,7 @@
         display: flex;
         flex-direction: row;
         .text {
-          border: 2rpx solid $borderColor;
+          border: 1rpx solid $borderColor;
           width: 100%;
         }
         .button {
@@ -131,7 +131,7 @@
           height: 50rpx;
           width: 100rpx;
           margin-right: 25rpx;
-          margin-left: 25rpx
+          margin-left: 10rpx
         }
       }
 

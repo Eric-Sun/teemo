@@ -13,8 +13,8 @@
           <img v-if="anonymous==1" class='head-img' :src='reply.userAvatarUrl'
           >
           <div class='info'>
-            <span>{{reply.userName}}</span>
-            <span class='time'>{{formatCreateAt}}</span>
+            <div class="name">{{reply.userName}}</div>
+            <div class='time'>{{formatCreateAt}}</div>
             <div class='content'>
               {{reply.content}}
             </div>
@@ -210,6 +210,9 @@
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
+        .name{
+          font-size: $userName-font-size;
+        }
 
         .time {
           font-size: $time-font-size;
@@ -229,6 +232,7 @@
     }
 
     .body {
+      height: 100vh;
       padding: 15rpx;
       background-color: rgb(245, 245, 239);
 
@@ -242,7 +246,7 @@
       }
 
       .reply {
-        /*background-color: white;*/
+        background-color: white;
         .reply-title {
           font-size: 25rpx;
           margin-bottom: 20rpx;
@@ -271,22 +275,24 @@
             .reply-info {
               display: flex;
               flex-direction: column;
+              margin-top:10rpx;
               margin-left: 20rpx;
               margin-right: 50rpx;
               width: 100%;
+              
 
               & > span {
-                font-weight: lighter;
-                color: gray;
+                /*font-weight: lighter;*/
+                /*color: gray;*/
                 font-size: $reply-content-font-size;
               }
 
               .reply-content {
                 width: 100%;
-                white-space: pre-line;
+                /*white-space: pre-line;*/
                 text-align: justify;
                 text-justify: inter-ideograph;
-                font-weight: 200;
+                /*font-weight: 200;*/
                 font-size: $reply-content-font-size;
 
               }
@@ -305,8 +311,8 @@
 
                 .action {
                   .item {
-                    height: 40rpx;
-                    width: 40rpx;
+                    height: 30rpx;
+                    width: 30rpx;
                     margin-left: 50rpx;
                   }
                 }
@@ -318,8 +324,8 @@
 
           .reply-divide {
             border-bottom: 1px solid #ccc;
-            margin-bottom: 20rpx;
-            margin-top: 20rpx;
+            margin-bottom: 10rpx;
+            margin-top: 10rpx;
             margin-right: 20rpx;
           }
         }

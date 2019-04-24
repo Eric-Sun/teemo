@@ -17,6 +17,7 @@
       </span>
     </div>
     <div class='body'>
+      <div class="title">{{item.title}}</div>
       <pre>{{formatContent}}</pre>
     </div>
     <div class='foot' v-if='!hidden'>
@@ -198,6 +199,12 @@
         text-justify: inter-ideograph;
         font-weight: normal;
         font-size: $content-font-size;
+      }
+
+      .title {
+        font-size: 40rpx;
+        font-weight: 900;
+        margin-bottom: 10rpx;
       }
     }
 
