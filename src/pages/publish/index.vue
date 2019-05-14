@@ -13,15 +13,27 @@
     </picker>
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
-
+    <!--    <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传4张)</div>-->
+    <lu class="upload-imgs">
+      <li v-if="imgList.length>=4 ? false : true">
+        <input type="file" class="upload" @click="uploadImg()" ref="inputer"
+               multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
+        <a class="add"><i class="iconfont icon-plus"></i>
+          <p>点击上传2222</p></a>
+      </li>
+      <li v-for='(img, index) in imgList' :key='index'>
+        <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)"></a>
+        </p>
+      </li>
+    </lu>
     <button @click.stop="handle">发帖</button>
   </div>
 </template>
 
 <script>
   import login from '../../components/login'
-  import { api } from '../../const'
-  import { barId } from '../../const'
+  import {api} from '../../const'
+  import {barId} from '../../const'
   import {checkT} from '../../utils/net'
 
 
@@ -31,11 +43,10 @@
     },
 
     watch: {
-      content (next) {
-        console.log(next)
+      content(next) {
       }
     },
-    data () {
+    data() {
       return {
         type: {
           pickerData: ['故事贴', '一日一记'],
@@ -49,22 +60,73 @@
         content: '',
         loginVisible: false,
         tab: 'markdown', // or preview
-        t: ''
+        t: '',
+        imgList: []
       }
     },
     methods: {
-      bindPickerChange (e) {
+      async uploadImg() {
+        var that = this;
+        wx.chooseImage({
+          count: 1, //最多可以选择的图片总数
+          sizeType: ['original'], // 只能是原图
+          sourceType: ['album'], // 只能是相册
+          success: function (res) {
+            // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+            var tempFilePaths = res.tempFilePaths;
+            wx.showToast({
+              title: '正在上传...',
+              icon: 'loading',
+              mask: true,
+              duration: 10000
+            })
+
+
+            wx.uploadFile({
+              url: "http://localhost:8081/api",
+              filePath: tempFilePaths[0],
+              name: "file",
+              header: {
+                "Content-Type": "multipart/form-data"
+              },
+              formData: {
+                "act": "img.upload",
+                "type": 2
+              },
+              dataType: "json",
+              success: function (res) {
+                var data = JSON.parse(res.data);
+                var file = new Object();
+                file.url = data.url;
+                file.imgId = data.imgId;
+                that.imgList.push(file);
+                wx.hideToast();
+              }
+            });
+
+          }
+        })
+      },
+      delImg(index) {
+        this.$delete(this.imgs, index);
+      },
+      bindPickerChange(e) {
         // console.log(e)
         this.type.index = e.mp.detail.value
       },
-      bindPickerChange1 (e) {
+      bindPickerChange1(e) {
         // console.log(e)
         this.anon.index = e.mp.detail.value
       },
-      changeTab (e) {
+      changeTab(e) {
         this.tab = e.target.dataset.tab
       },
-      async handle () {
+      async handle() {
+        var imgIdList = [];
+        console.log(this.imgList.length)
+        for (var i = 0; i < this.imgList.length; i++) {
+          imgIdList.push(this.imgList[i].imgId)
+        }
         var that = this;
         if (this.type.index == -1) {
           wx.showToast({
@@ -88,18 +150,18 @@
           this.title,
           content:
           this.content,
+          imgList: JSON.stringify(imgIdList),
           type: this.type.index,
           anonymous: this.anon.index
         }).then(function (response) {
           if (!response.data.code) {
-            console.log(response.data.postId)
             wx.showToast({
               title: '发帖成功',
               icon: 'none',
               duration: 2000
             })
-            that.title=''
-            that.content=''
+            that.title = ''
+            that.content = ''
             wx.switchTab({
               url: `../index/main`
             })
@@ -108,14 +170,14 @@
 
       }
       ,
-      closeModalEvent () {
+      closeModalEvent() {
         this.visible = false
       }
     },
-    onShow () {
+    onShow() {
       var that = this;
-      var t = wx.getStorageSync("t")
-      checkT(t,
+      this.t = wx.getStorageSync("t")
+      checkT(this.t,
         function () {
           that.loginVisible = true
         },
@@ -129,6 +191,7 @@
   .container {
     height: 100vh;
     background-color: rgb(245, 245, 249);
+
     .list {
       display: flex;
       /*justify-content: space-between;*/
@@ -137,12 +200,14 @@
       height: 90rpx;
       padding: 0 30rpx;
       line-height: 90rpx;
+
       .input {
-        margin-left:150rpx;
+        margin-left: 150rpx;
         height: 90rpx;
         line-height: 90rpx;
       }
     }
+
     .picker {
       display: flex;
       /*justify-content: space-between;*/
@@ -152,19 +217,22 @@
       line-height: 90rpx;
       padding: 0 30rpx;
     }
+
     .tabs {
       display: flex;
       background-color: white;
+
       & > div {
         width: 50%;
         text-align: center;
       }
     }
+
     .textarea {
       width: 100%;
       background-color: white;
       margin-bottom: 30rpx;
-      height: 500rpx;
+      height: 300rpx;
       padding: 0 30rpx;
       box-sizing: border-box;
     }
@@ -173,5 +241,82 @@
   .selected {
     color: $color;
     border-bottom: 2rpx solid $color;
+  }
+
+  .upload-imgs {
+    margin: 10px 0 30px 0;
+    overflow: hidden;
+    font-size: 0;
+  }
+
+  .upload-imgs li {
+    position: relative;
+    width: 118px;
+    height: 118px;
+    font-size: 14px;
+    display: inline-block;
+    padding: 10px;
+    margin-right: 25px;
+    border: 2px dashed #ccc;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .upload-imgs li:hover {
+    border-color: #ffffff;
+  }
+
+  .upload-imgs .add {
+    display: block;
+    background-color: #ccc;
+    color: #ffffff;
+    height: 94px;
+    padding: 8px 0;
+  }
+
+  .upload-imgs .add .iconfont {
+    padding: 10px 0;
+    font-size: 40px;
+  }
+
+  .upload-imgs li:hover .add {
+    background-color: #ffffff;
+  }
+
+  .upload-imgs li .upload {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 118px;
+    height: 118px;
+  }
+
+  .upload-imgs .img {
+    position: relative;
+    width: 94px;
+    height: 94px;
+    line-height: 94px;
+  }
+
+  .upload-imgs .img img {
+    vertical-align: middle;
+    width: 94px;
+    height: 94px;
+  }
+
+  .upload-imgs .img .close {
+    display: none;
+  }
+
+  .upload-imgs li:hover .img .close {
+    display: block;
+    position: absolute;
+    right: -6px;
+    top: -10px;
+    line-height: 1;
+    font-size: 22px;
+    color: #aaa;
   }
 </style>

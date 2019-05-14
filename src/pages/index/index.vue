@@ -68,42 +68,7 @@
         this.getData('story', 0)
       },
 
-      // async uploadImg () {
-      //   console.log(1);
-      //   var that = this;
-      //   wx.chooseImage({
-      //     count: 1, //最多可以选择的图片总数
-      //     sizeType: ['original'], // 只能是原图
-      //     sourceType: ['album'], // 只能是相册
-      //     success: function(res) {
-      //       // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
-      //       var tempFilePaths = res.tempFilePaths;
-      //       wx.showToast({
-      //         title: '正在上传...',
-      //         icon: 'loading',
-      //         mask: true,
-      //         duration: 10000
-      //       })
-      //
-      //
-      //       wx.uploadFile({
-      //         url: "http://localhost:8081/api",
-      //         filePath: tempFilePaths[0],
-      //         name: "file",
-      //         header: {
-      //           "Content-Type": "multipart/form-data"
-      //         },
-      //         formData: {
-      //           "act": "img.upload",
-      //         },
-      //         success: function(res) {
-      //           wx.hideToast();
-      //          }
-      //       });
-      //
-      //     }
-      //   })
-      // },
+     
       async getData(tab, page) {
         var that =this;
 
