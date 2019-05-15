@@ -22,7 +22,7 @@
           <p>点击上传2222</p></a>
       </li>
       <li v-for='(img, index) in imgList' :key='index'>
-        <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)"></a>
+        <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)">x</a>
         </p>
       </li>
     </lu>
@@ -108,7 +108,7 @@
         })
       },
       delImg(index) {
-        this.$delete(this.imgs, index);
+        this.imgList.splice(index,1);
       },
       bindPickerChange(e) {
         // console.log(e)
@@ -251,13 +251,13 @@
 
   .upload-imgs li {
     position: relative;
-    width: 118px;
-    height: 118px;
-    font-size: 14px;
+    width: 300rpx;
+    height: 300rpx;
+    font-size: 35rpx;
     display: inline-block;
-    padding: 10px;
-    margin-right: 25px;
-    border: 2px dashed #ccc;
+    padding: 10rpx;
+    margin-right: 25rpx;
+    border: 2rpx dashed #ccc;
     text-align: center;
     vertical-align: middle;
   }
@@ -270,13 +270,13 @@
     display: block;
     background-color: #ccc;
     color: #ffffff;
-    height: 94px;
-    padding: 8px 0;
+    height: 300rpx;
+    padding: 8rpx 0;
   }
 
   .upload-imgs .add .iconfont {
-    padding: 10px 0;
-    font-size: 40px;
+    padding: 10rpx 0;
+    font-size: 40rpx;
   }
 
   .upload-imgs li:hover .add {
@@ -289,32 +289,32 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 118px;
-    height: 118px;
+    width: 300rpx;
+    height: 300rpx;
   }
 
   .upload-imgs .img {
     position: relative;
-    width: 94px;
-    height: 94px;
-    line-height: 94px;
+    width: 1rpx;
+    height: 300rpx;
+    line-height: 300rpx;
   }
 
   .upload-imgs .img img {
     vertical-align: middle;
-    width: 94px;
-    height: 94px;
+    width: 280rpx;
+    height: 280rpx;
   }
 
   .upload-imgs .img .close {
-    display: none;
+    /*display: none;*/
   }
 
   .upload-imgs li:hover .img .close {
     display: block;
     position: absolute;
-    right: -6px;
-    top: -10px;
+    right: -6rpx;
+    top: -10rpx;
     line-height: 1;
     font-size: 22px;
     color: #aaa;
