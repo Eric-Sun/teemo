@@ -19,6 +19,9 @@
     <div class='body'>
       <div class="title">{{item.title}}</div>
       <pre>{{formatContent}}</pre>
+      <div class="imgs" v-for="(img,index) in item.imgList">
+        <img class="img" :src="img.url" @click.stop="previewImg(index)">
+      </div>
     </div>
     <div class='foot' v-if='!hidden'>
       <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
@@ -60,6 +63,16 @@
       }
     },
     methods: {
+      previewImg(index) {
+        const urlList = []
+        for (var i = 0; i < this.item.imgList.length; i++) {
+          urlList.push(this.item.imgList[i].url);
+        }
+        wx.previewImage({
+          current: this.item.imgList[index].url, // 当前显示图片的http链接
+          urls: urlList // 需要预览的图片http链接列表
+        })
+      },
       goAuthorPage(e) {
 
         const cachedUserId = wx.getStorageSync('userId')
@@ -192,6 +205,20 @@
       margin-top: 10rpx;
       margin-bottom: 20rpx;
       margin-left: 10rpx;
+
+      .imgs {
+        margin-top: 5rpx;
+        font-size: 35rpx;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+
+        .img {
+          margin-right: 5rpx;
+          width: 210rpx;
+          height: 210rpx;
+        }
+      }
 
       & > pre {
         white-space: pre-line;

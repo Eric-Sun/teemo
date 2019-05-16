@@ -24,6 +24,9 @@
         <div class='content'>
           {{detailData.content}}
         </div>
+        <div class="imgs" v-for="(img,imgIndex) in detailData.imgList">
+          <img class="img" :src="img.url" @click.stop="previewImg(imgIndex)">
+        </div>
 
         <div class='reply'>
           <div class="reply-title">
@@ -146,6 +149,16 @@
     },
 
     methods: {
+      previewImg(index) {
+        const urlList = []
+        for (var i = 0; i < this.detailData.imgList.length; i++) {
+          urlList.push(this.detailData.imgList[i].url);
+        }
+        wx.previewImage({
+          current: this.detailData.imgList[index].url, // 当前显示图片的http链接
+          urls: urlList // 需要预览的图片http链接列表
+        })
+      },
       getSearchTypeActionSheet() {
         var that = this
         var itemList = ['按时间正序', '按时间倒序']
@@ -417,6 +430,20 @@
     .body {
       height: 90vh;
       width: 100vw;
+
+      .imgs {
+        padding-left: 30rpx;
+        margin-top:5rpx;
+        font-size: 35rpx;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        .img{
+          margin-right:5rpx;
+          width: 210rpx;
+          height: 210rpx;
+        }
+      }
 
       .title {
         background-color: white;

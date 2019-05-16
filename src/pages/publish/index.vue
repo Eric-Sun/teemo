@@ -13,13 +13,13 @@
     </picker>
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
-    <!--    <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传4张)</div>-->
+        <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
     <lu class="upload-imgs">
-      <li v-if="imgList.length>=4 ? false : true">
+      <li v-if="imgList.length>=9 ? false : true">
         <input type="file" class="upload" @click="uploadImg()" ref="inputer"
                multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
         <a class="add"><i class="iconfont icon-plus"></i>
-          <p>点击上传2222</p></a>
+          <p>点击上传</p></a>
       </li>
       <li v-for='(img, index) in imgList' :key='index'>
         <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)">x</a>
@@ -111,11 +111,9 @@
         this.imgList.splice(index,1);
       },
       bindPickerChange(e) {
-        // console.log(e)
         this.type.index = e.mp.detail.value
       },
       bindPickerChange1(e) {
-        // console.log(e)
         this.anon.index = e.mp.detail.value
       },
       changeTab(e) {
@@ -123,7 +121,6 @@
       },
       async handle() {
         var imgIdList = [];
-        console.log(this.imgList.length)
         for (var i = 0; i < this.imgList.length; i++) {
           imgIdList.push(this.imgList[i].imgId)
         }
@@ -248,11 +245,15 @@
     overflow: hidden;
     font-size: 0;
   }
+  .help-block{
+    margin-left: 10rpx;
+    font-size:25rpx;
+  }
 
   .upload-imgs li {
     position: relative;
-    width: 300rpx;
-    height: 300rpx;
+    width: 200rpx;
+    height: 200rpx;
     font-size: 35rpx;
     display: inline-block;
     padding: 10rpx;
@@ -270,7 +271,7 @@
     display: block;
     background-color: #ccc;
     color: #ffffff;
-    height: 300rpx;
+    height: 200rpx;
     padding: 8rpx 0;
   }
 
@@ -289,32 +290,32 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 300rpx;
-    height: 300rpx;
+    width: 200rpx;
+    height: 200rpx;
   }
 
   .upload-imgs .img {
     position: relative;
     width: 1rpx;
-    height: 300rpx;
-    line-height: 300rpx;
+    height: 200rpx;
+    line-height: 200rpx;
   }
 
   .upload-imgs .img img {
     vertical-align: middle;
-    width: 280rpx;
-    height: 280rpx;
+    width: 180rpx;
+    height: 180rpx;
   }
 
   .upload-imgs .img .close {
-    /*display: none;*/
+    display: none;
   }
 
   .upload-imgs li:hover .img .close {
     display: block;
     position: absolute;
-    right: -6rpx;
-    top: -10rpx;
+    right: -20rpx;
+    top: -20rpx;
     line-height: 1;
     font-size: 22px;
     color: #aaa;
