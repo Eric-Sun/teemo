@@ -83,7 +83,7 @@
 
 
             wx.uploadFile({
-              url: "http://localhost:8081/api",
+              url: `${api}`,
               filePath: tempFilePaths[0],
               name: "file",
               header: {
