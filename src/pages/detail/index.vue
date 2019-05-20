@@ -48,6 +48,9 @@
               <div class='reply-content'>
                 {{item.content}}
               </div>
+              <div v-if="item.imgList.length!=0" >
+                <img class='reply-imgList' :src="item.imgList[0].url">
+              </div>
               <div class="reply-replyList-div"
                    @click.stop="navigateToReply"
                    :data-replyid="item.replyId"
@@ -524,6 +527,10 @@
               font-size: $reply-content-font-size;
             }
 
+            .reply-imgList{
+              height: 210rpx;
+              width: 210rpx;
+            }
             .reply-content {
               width: 100%;
               white-space: pre-line;

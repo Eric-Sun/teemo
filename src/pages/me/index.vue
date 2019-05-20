@@ -5,7 +5,6 @@
     <div class='list'>
       <!--<navigator class='list-item' @click.stop='setListFrom' url='/pages/list/main?type=collect' data-item='collect'>我的收藏</navigator>-->
       <navigator class='list-item' @click.stop='setListFrom' url='/pages/list/main?type=topic' data-item='topic'>最近话题</navigator>
-      <!--<navigator class='list-item' @click.stop='setListFrom' url='/pages/list/main?type=reply' data-item='reply'>最近回复</navigator>-->
     </div>
   </div>
 </template>
@@ -76,7 +75,7 @@
         padding: 10rpx 0;
       }
       .list-item + .list-item {
-        border-top: 2rpx solid $borderColor;
+        border-top: 1rpx solid $borderColor;
       }
       .margin {
         margin-top: 30rpx;

@@ -13,7 +13,7 @@
     </picker>
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
-        <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
+    <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
     <lu class="upload-imgs">
       <li v-if="imgList.length>=9 ? false : true">
         <input type="file" class="upload" @click="uploadImg()" ref="inputer"
@@ -50,7 +50,7 @@
       return {
         type: {
           pickerData: ['故事贴', '一日一记'],
-          index: 0
+          index: 1
         },
         anon: {
           pickerData: ['非匿名', '匿名'],
@@ -108,7 +108,7 @@
         })
       },
       delImg(index) {
-        this.imgList.splice(index,1);
+        this.imgList.splice(index, 1);
       },
       bindPickerChange(e) {
         this.type.index = e.mp.detail.value
@@ -120,6 +120,24 @@
         this.tab = e.target.dataset.tab
       },
       async handle() {
+        if (this.title.length == 0) {
+          wx.showToast({
+            title: '标题不能为空',
+            icon: 'none',
+            duration: 2000
+          })
+          return;
+        }
+
+        if (this.content.length == 0) {
+          wx.showToast({
+            title: '内容不能为空',
+            icon: 'none',
+            duration: 2000
+          })
+          return
+        }
+
         var imgIdList = [];
         for (var i = 0; i < this.imgList.length; i++) {
           imgIdList.push(this.imgList[i].imgId)
@@ -245,9 +263,10 @@
     overflow: hidden;
     font-size: 0;
   }
-  .help-block{
+
+  .help-block {
     margin-left: 10rpx;
-    font-size:25rpx;
+    font-size: 25rpx;
   }
 
   .upload-imgs li {

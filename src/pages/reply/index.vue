@@ -8,9 +8,9 @@
       <scroll-view scroll-y='true' @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
                    @scrolltolower='getMore'>
         <div class='head'>
-          <img v-if="anonymous==0" class='head-img' :src='reply.userAvatarUrl'
+          <img v-if="postAnonymous==0" class='head-img' :src='reply.userAvatarUrl'
                @click.stop='goAuthorPage'>
-          <img v-if="anonymous==1" class='head-img' :src='reply.userAvatarUrl'
+          <img v-if="postAnonymous==1" class='head-img' :src='reply.userAvatarUrl'
           >
           <div class='info'>
             <div class="name">{{reply.userName}}</div>
@@ -28,9 +28,9 @@
                  :data-id='item.id'>
               <div class="reply-container">
                 <div class='reply-head'>
-                  <img v-if="anonymous==0" class='head-img' :src='item.userAvatarUrl'
+                  <img v-if="postAnonymous==0" class='head-img' :src='item.userAvatarUrl'
                        @click.stop='goAuthorPage'/>
-                  <img v-if="anonymous==1" class='head-img' :src='item.userAvatarUrl'
+                  <img v-if="postAnonymous==1" class='head-img' :src='item.userAvatarUrl'
                   />
                 </div>
                 <div class="reply-info">
@@ -38,6 +38,9 @@
                   <div class='reply-content'>
                     {{item.lastReplyId!=reply.replyId?
                     '回复@'+item.lastReplyUserName+':'+item.content:item.content}}
+                  </div>
+                  <div v-if="item.imgList.length!=0">
+                    <img class="reply-imgList" :src="item.imgList[0].url">
                   </div>
                   <div class="reply-foot">
                     <div class="time">
@@ -295,6 +298,10 @@
                 /*font-weight: 200;*/
                 font-size: $reply-content-font-size;
 
+              }
+              .reply-imgList{
+                width: 180rpx;
+                height: 180rpx;
               }
 
               .reply-foot {
