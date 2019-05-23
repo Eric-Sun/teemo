@@ -14,7 +14,7 @@
           >
           <div class='info'>
             <div class="name">{{reply.userName}}</div>
-            <div class='time'>{{formatCreateAt}}</div>
+<!--            <div class='time'>{{formatCreateAt}}</div>-->
             <div class='content'>
               {{reply.content}}
             </div>
@@ -43,9 +43,9 @@
                     <img class="reply-imgList" :src="item.imgList[0].url">
                   </div>
                   <div class="reply-foot">
-                    <div class="time">
-                      {{formatCreateAt}}
-                    </div>
+<!--                    <div class="time">-->
+<!--                      {{formatCreateAt}}-->
+<!--                    </div>-->
                     <div class="action">
                       <img class="item"
                            :data-username="item.userName" :data-replyid='item.replyId'
@@ -320,7 +320,7 @@
                   .item {
                     height: 30rpx;
                     width: 30rpx;
-                    margin-left: 50rpx;
+                    /*margin-left: 50rpx;*/
                   }
                 }
               }

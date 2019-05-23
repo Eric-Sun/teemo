@@ -8,7 +8,7 @@
       <div class='info'>
         <span class="name">{{item.userName}}</span>
 
-        <span class='time'>{{formatCreateAt}}</span>
+<!--        <span class='time'>{{formatCreateAt}}</span>-->
       </div>
       <span class="top">
               <img class="ellipsis" src="../../static/ellipsis.png"
@@ -74,7 +74,6 @@
         })
       },
       goAuthorPage(e) {
-
         const cachedUserId = wx.getStorageSync('userId')
         const cardUserId = e.currentTarget.dataset.userid
         if (cachedUserId == cardUserId) {

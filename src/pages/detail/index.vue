@@ -1,5 +1,8 @@
 <template>
   <div class='container'>
+    <img  v-if="isShare==1" @click.stop='backHome' class='d-back-home'
+           src='http://cdn.xcx.pemarket.com.cn/icon-Return%20to%20the%20home%20page.png' >
+
     <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
                :postId='id' :replyId='replyId' :isPostUserId='isPostUserId'
@@ -12,7 +15,7 @@
         >
         <div class='info'>
           <span>{{detailData.userName}}</span>
-          <span class='time'>{{formatCreateAt}}</span>
+          <!--          <span class='time'>{{formatCreateAt}}</span>-->
         </div>
       </div>
 
@@ -48,7 +51,7 @@
               <div class='reply-content'>
                 {{item.content}}
               </div>
-              <div v-if="item.imgList.length!=0" >
+              <div v-if="item.imgList.length!=0">
                 <img class='reply-imgList' :src="item.imgList[0].url">
               </div>
               <div class="reply-replyList-div"
@@ -80,9 +83,9 @@
               <img class='up-png' src="/static/go-bottom.png" mode='widthFix' @click.stop="goBottom">
 
               <div class="reply-foot">
-                <div class="time">
-                  {{formatCreateAt}}
-                </div>
+                <!--                <div class="time">-->
+                <!--                  {{formatCreateAt}}-->
+                <!--                </div>-->
                 <div class="action">
                   <img class="item"
                        :data-username="item.userName"
@@ -150,8 +153,16 @@
         })
       }
     },
+    onShareAppMessage: function () {
+      return {
+        title: this.detailData.title,//分享内容
+        path: '/pages/detail/main?postId=' + this.id + "&share=1" //分享地址
+        // imageUrl: '/images/img_share.png',//分享图片
+      }
 
+    },
     methods: {
+
       previewImg(index) {
         const urlList = []
         for (var i = 0; i < this.detailData.imgList.length; i++) {
@@ -277,6 +288,11 @@
 
         wx.hideLoading()
       },
+      backHome: function () {
+        wx.reLaunch({
+          url: '/pages/index/main'
+        })
+      },
       async upOrCancel(e) {
         // / todo 防抖
         // console.log(e);
@@ -362,7 +378,11 @@
     ,
     onLoad() {
       this.id = this.$root.$mp.query.postId
+      if (this.$root.$mp.query.share == 1) {
+        this.isShare = 1;
+      }
       console.log('postId=' + this.id)
+      console.log(this.isShare)
     },
     onShow() {
       this.pageNum = 0
@@ -396,7 +416,8 @@
         canGetMoreReply: true,
         replySearchType: 0, //回帖的排序规则，默认正序
         requestAction: 'reply.list',
-        loginVisible: false
+        loginVisible: false,
+        isShare: 0
       }
     }
   }
@@ -436,13 +457,14 @@
 
       .imgs {
         padding-left: 30rpx;
-        margin-top:5rpx;
+        margin-top: 5rpx;
         font-size: 35rpx;
         display: inline-block;
         text-align: center;
         vertical-align: middle;
-        .img{
-          margin-right:5rpx;
+
+        .img {
+          margin-right: 5rpx;
           width: 210rpx;
           height: 210rpx;
         }
@@ -484,7 +506,7 @@
           flex-direction: row;
           justify-content: space-between;
           margin-bottom: 10rpx;
-          margin-top:10rpx;
+          margin-top: 10rpx;
 
           .reply-length {
             font-size: 30rpx;
@@ -495,7 +517,7 @@
           .change-reply-search-type {
             font-size: 30rpx;
             margin-left: 25rpx;
-            margin-right:20rpx;
+            margin-right: 20rpx;
             font-weight: lighter;
           }
         }
@@ -527,10 +549,11 @@
               font-size: $reply-content-font-size;
             }
 
-            .reply-imgList{
+            .reply-imgList {
               height: 210rpx;
               width: 210rpx;
             }
+
             .reply-content {
               width: 100%;
               white-space: pre-line;
@@ -557,7 +580,7 @@
                 .item {
                   height: 35rpx;
                   width: 35rpx;
-                  margin-left: 50rpx;
+                  /*margin-left: 50rpx;*/
                 }
               }
             }
@@ -622,8 +645,8 @@
 
       .up-png {
         width: 100rpx;
-        top: 75vh;
-        left: 81vw;
+        right: 30rpx;
+        bottom: 166rpx;
         position: fixed;
       }
 
@@ -665,5 +688,13 @@
       height: 50rpx;
       width: 50rpx;
     }
+  }
+  .d-back-home {
+    position: fixed;
+    width: 96rpx;
+    height: 96rpx;
+    right: 30rpx;
+    bottom: 286rpx;
+    z-index: 10000;
   }
 </style>

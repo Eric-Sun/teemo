@@ -16,8 +16,7 @@
     <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
     <lu class="upload-imgs">
       <li v-if="imgList.length>=9 ? false : true">
-        <input type="file" class="upload" @click="uploadImg()" ref="inputer"
-               multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
+        <input type="file" class="upload" @click="uploadImg()" ref="inputer"/>
         <a class="add"><i class="iconfont icon-plus"></i>
           <p>点击上传</p></a>
       </li>
@@ -69,7 +68,7 @@
         var that = this;
         wx.chooseImage({
           count: 1, //最多可以选择的图片总数
-          sizeType: ['original'], // 只能是原图
+          sizeType: ['compressed'], // 只能是原图
           sourceType: ['album'], // 只能是相册
           success: function (res) {
             // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
@@ -78,7 +77,7 @@
               title: '正在上传...',
               icon: 'loading',
               mask: true,
-              duration: 10000
+              duration: 20000
             })
 
 
