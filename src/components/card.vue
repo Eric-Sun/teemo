@@ -1,5 +1,5 @@
 <template>
-  <div class='container'>
+  <div class='container' >
     <div class='head'>
       <img v-if="item.anonymous==0" class='head-img' :src='item.userAvatarUrl'
            @click.stop='goAuthorPage' :data-userid="item.userId">
@@ -171,7 +171,7 @@
     background-color: white;
     display: flex;
     flex-direction: column;
-    /*justify-content: space-between;*/
+    justify-content: space-between;
 
     .head {
       color: black;
