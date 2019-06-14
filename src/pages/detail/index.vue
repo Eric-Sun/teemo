@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
+      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'  @scrolltolower='getMore'
       >
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>

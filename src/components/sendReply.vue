@@ -1,29 +1,33 @@
 <template>
   <div class="mask" @click.stop="closeModal">
     <div class="container" @click.stop="prevent">
-      <radio-group v-if="postAnonymous==0&&!isPostUserId" class="anonymous" @click.stop="changeAnonymous">
-        <radio :data-value="0" checked="checked"/>
-        非匿名
-        <radio :data-value="1"/>
-        匿名
-      </radio-group>
-      <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
-      <lu class="upload-imgs">
-        <li v-if="imgList.length>=1 ? false : true">
-          <input type="file" class="upload" @click="uploadImg()" ref="inputer"
-                 multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>
-          <a class="add"><i class="iconfont icon-plus"></i>
-            <p>点击上传</p></a>
-        </li>
-        <li v-for='(img, index) in imgList' :key='index'>
-          <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)">x</a>
-          </p>
-        </li>
-      </lu>
       <div class="action">
-        <input class='text' v-model="content" placeholder="说点啥....."></input>
+        <radio-group v-if="postAnonymous==0&&!isPostUserId" class="anonymous" @click.stop="changeAnonymous">
+          <radio :data-value="0" checked="checked"/>
+          非匿名
+          <radio :data-value="1"/>
+          匿名
+        </radio-group>
         <label class="button" @click.stop="send">提交</label>
       </div>
+      <div class="inputText">
+        <textarea class='text' v-model="content" placeholder="说点啥....."></textarea>
+      </div>
+
+      <!--      <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>-->
+      <!--      <lu class="upload-imgs">-->
+      <!--        <li v-if="imgList.length>=1 ? false : true">-->
+      <!--          <input type="file" class="upload" @click="uploadImg()" ref="inputer"-->
+      <!--                 multiple accept="image/png,image/jpeg,image/gif,image/jpg"/>-->
+      <!--          <a class="add"><i class="iconfont icon-plus"></i>-->
+      <!--            <p>点击上传</p></a>-->
+      <!--        </li>-->
+      <!--        <li v-for='(img, index) in imgList' :key='index'>-->
+      <!--          <p class="img"><img :src="img.url"><a class="close" @click="delImg(index)">x</a>-->
+      <!--          </p>-->
+      <!--        </li>-->
+      <!--      </lu>-->
+
     </div>
   </div>
 </template>
@@ -156,7 +160,7 @@
               that.$emit('reply-success')
             }
           })
-        this.imgList=[]
+        this.imgList = []
       }
       ,
       closeModal() {
@@ -180,32 +184,41 @@
       justify-content: space-between;
       position: absolute;
       bottom: 0;
+      height: 90vh;
       width: 100%;
       box-sizing: border-box;
       padding: 5px;
 
-      .anonymous {
-        display: flex;
-        flex-direction: row;
-      }
 
       .action {
         display: flex;
         flex-direction: row;
-
-        .text {
-          border: 1rpx solid $borderColor;
-          width: 100%;
+        justify-content: space-between;
+        margin-top:10rpx;
+        .anonymous {
+          display: flex;
+          flex-direction: row;
         }
+
 
         .button {
           color: dodgerblue;
           height: 50rpx;
           width: 100rpx;
-          margin-right: 25rpx;
-          margin-left: 10rpx
+          margin-right: 10rpx
         }
       }
+
+      .inputText {
+
+        .text {
+          border: 1rpx solid $borderColor;
+          margin: 10rpx;
+          height: 80vh;
+
+        }
+      }
+
 
       .upload-imgs {
         margin: 10px 0 30px 0;

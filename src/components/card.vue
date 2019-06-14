@@ -1,5 +1,5 @@
 <template>
-  <div class='container' @click.stop="goDetail($event)">
+  <div class='container'>
     <div class='head'>
       <img v-if="item.anonymous==0" class='head-img' :src='item.userAvatarUrl'
            @click.stop='goAuthorPage' :data-userid="item.userId">
@@ -8,7 +8,7 @@
       <div class='info'>
         <span class="name">{{item.userName}}</span>
 
-<!--        <span class='time'>{{formatCreateAt}}</span>-->
+        <!--        <span class='time'>{{formatCreateAt}}</span>-->
       </div>
       <span class="top">
               <img class="ellipsis" src="../../static/ellipsis.png"
@@ -16,7 +16,7 @@
                    @click.stop="loadActions($event)"/>
       </span>
     </div>
-    <div class='body'>
+    <div class='body' @click.stop="goDetail($event)">
       <div class="title">{{item.title}}</div>
       <pre>{{formatContent}}</pre>
       <div class="imgs" v-for="(img,index) in item.imgList">
@@ -24,10 +24,14 @@
       </div>
     </div>
     <div class='foot' v-if='!hidden'>
-      <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
-      <div class="reply-count">{{item.replyCount}}</div>
+      <div class="reply-items">
+        <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
+        <div class="reply-count">{{item.replyCount}}</div>
+      </div>
+      <button class="wechat-share" style="background-image: url(../../static/share.png)" hover-class="none" open-type="share" plain="true"/>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -63,6 +67,15 @@
       }
     },
     methods: {
+      onShareAppMessage: function () {
+        console.log("fdsfds");
+        return {
+          title: this.item.title,//分享内容
+          path: '/pages/detail/main?postId=' + this.id + "&share=1" //分享地址
+          // imageUrl: '/images/img_share.png',//分享图片
+        }
+
+      },
       previewImg(index) {
         const urlList = []
         for (var i = 0; i < this.item.imgList.length; i++) {
@@ -158,7 +171,7 @@
     background-color: white;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /*justify-content: space-between;*/
 
     .head {
       color: black;
@@ -237,19 +250,35 @@
     .foot {
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
 
-      .reply-img {
-        margin-left: 20rpx;
+      .reply-items {
+        display: flex;
+        flex-direction: row;
+
+        .reply-img {
+          margin-left: 20rpx;
+          height: 35rpx;
+          width: 35rpx;
+
+        }
+
+        .reply-count {
+          margin-left: 10rpx;
+          height: 35rpx;
+          font-weight: 100;
+        }
+      }
+
+      .wechat-share {
         height: 35rpx;
         width: 35rpx;
-
+        margin-right: 10rpx;
+        background-size: 35rpx 35rpx;
+        background-repeat:no-repeat;
+        border:none;
       }
 
-      .reply-count {
-        margin-left: 10rpx;
-        height: 35rpx;
-        font-weight: 100;
-      }
     }
   }
 </style>
