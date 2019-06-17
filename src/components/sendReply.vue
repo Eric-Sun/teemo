@@ -2,12 +2,12 @@
   <div class="mask" @click.stop="closeModal">
     <div class="container" @click.stop="prevent">
       <div class="action">
-        <radio-group v-if="postAnonymous==0&&!isPostUserId" class="anonymous" @click.stop="changeAnonymous">
-          <radio :data-value="0" checked="checked"/>
-          非匿名
-          <radio :data-value="1"/>
-          匿名
-        </radio-group>
+<!--        <radio-group v-if="postAnonymous==0&&!isPostUserId" class="anonymous" @click.stop="changeAnonymous">-->
+<!--          <radio :data-value="0" checked="checked"/>-->
+<!--          非匿名-->
+<!--          <radio :data-value="1"/>-->
+<!--          匿名-->
+<!--        </radio-group>-->
         <label class="button" @click.stop="send">提交</label>
       </div>
       <div class="inputText">
@@ -51,7 +51,7 @@
       },
       // 帖子本身是否是匿名帖子
       postAnonymous: {
-        default: '',
+        default: '0',
         type: String
       },
       // 用户是否是发帖用户
@@ -181,7 +181,7 @@
       display: flex;
       flex-direction: column;
       background-color: white;
-      justify-content: space-between;
+      /*justify-content: space-between;*/
       position: absolute;
       bottom: 0;
       height: 90vh;
@@ -193,8 +193,9 @@
       .action {
         display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: flex-end;
         margin-top:10rpx;
+        margin-left:10rpx;
         .anonymous {
           display: flex;
           flex-direction: row;
