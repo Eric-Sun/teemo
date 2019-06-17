@@ -8,9 +8,9 @@
     <picker class='picker' @change="bindPickerChange($event)" :value="type.index" :range="type.pickerData">
       <span>类型:</span><span style='margin-left:200rpx;'>{{type.pickerData[type.index]}}</span>
     </picker>
-<!--    <picker class='picker' @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">-->
-<!--      <span>匿名:</span><span style='margin-left:200rpx;'>{{anon.pickerData[anon.index]}}</span>-->
-<!--    </picker>-->
+    <!--    <picker class='picker' @change="bindPickerChange1($event)" :value="anon.index" :range="anon.pickerData">-->
+    <!--      <span>匿名:</span><span style='margin-left:200rpx;'>{{anon.pickerData[anon.index]}}</span>-->
+    <!--    </picker>-->
 
     <textarea v-show="tab==='markdown'" class='textarea' v-model="content"></textarea>
     <div class="help-block">上传图片(建议图片格式为：JPEG/BMP/PNG/GIF，大小不超过5M，最多可上传9张)</div>
@@ -178,6 +178,12 @@
             that.content = ''
             wx.switchTab({
               url: `../index/main`
+            })
+          } else if (response.data.code == 6) {
+            wx.showToast({
+              title: '您发的标题或内容违规，请修改后重发',
+              icon: 'none',
+              duration: 2000
             })
           }
         })

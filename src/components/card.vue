@@ -28,7 +28,7 @@
         <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
         <div class="reply-count">{{item.replyCount}}</div>
       </div>
-      <button class="wechat-share" style="background-image: url(../../static/share.png)" hover-class="none" open-type="share" plain="true"/>
+      <button class="wechat-share" open-type="share" plain="true"/>
     </div>
   </div>
 
@@ -271,12 +271,16 @@
       }
 
       .wechat-share {
-        height: 35rpx;
-        width: 35rpx;
+        height: 45rpx;
+        width: 45rpx;
         margin-right: 10rpx;
         background-size: 35rpx 35rpx;
         background-repeat:no-repeat;
+        background-image: url(../../static/share.png);
         border:none;
+      }
+      button::after {
+        border: none;
       }
 
     }

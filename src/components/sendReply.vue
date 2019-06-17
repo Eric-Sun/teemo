@@ -158,6 +158,12 @@
             if (!res.data.code) {
               that.content = ''
               that.$emit('reply-success')
+            }else if (res.data.code == 6) {
+              wx.showToast({
+                title: '您发的标题或内容违规，请修改后重发',
+                icon: 'none',
+                duration: 2000
+              })
             }
           })
         this.imgList = []
