@@ -1,7 +1,7 @@
 <template>
   <div class='container'>
-    <img  v-if="isShare==1" @click.stop='backHome' class='d-back-home'
-           src='http://cdn.xcx.pemarket.com.cn/icon-Return%20to%20the%20home%20page.png' >
+    <img v-if="isShare==1" @click.stop='backHome' class='d-back-home'
+         src='http://cdn.xcx.pemarket.com.cn/icon-Return%20to%20the%20home%20page.png'>
 
     <login :visible='loginVisible' v-on:modalClose='closeModalEvent'></login>
     <sendReply v-if='sendVisible' @close-modal='closeModal' @reply-success='replySuccess' :content='content'
@@ -19,7 +19,8 @@
         </div>
       </div>
 
-      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'  @scrolltolower='getMore'
+      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
+                   @scrolltolower='getMore'
       >
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
@@ -110,7 +111,7 @@
     <div class="controller">
       <div class="group1">
         <img class="comment" @click="showReplyModal" src="../../../static/comment.png"/>
-        <img class="praise" src="../../../static/praise.png"/>
+        <img class="praise" @click="doOrUndoCollect" src="../../../static/praise.png"/>
       </div>
       <div class="">
         <img class="share" src="../../../static/share.png"/>
@@ -137,6 +138,16 @@
       login
     },
     mounted() {
+
+      var t = wx.getStorageSync("t")
+      checkT(t,
+        function () {
+          that.loginVisible = true
+        },
+        function () {
+        }
+      );
+      this.t = wx.getStorageSync("t")
       this.getPostData()
       this.getReplyData()
     },
@@ -162,7 +173,69 @@
 
     },
     methods: {
+      async doOrUndoCollect() {
+        console.log(this.detailData.isCollect + "---")
 
+        if (this.detailData.isCollect == 1) {
+          const res2 = await this.$http.get(`${api}`, {
+            act: "post.collect.delete",
+            t: this.t,
+            postId: this.id
+          })
+          if (res2.data.code == 30003) {
+            wx.showToast({
+              title: '已经取消收藏了',
+              icon: 'none',
+              duration: 2000
+            })
+          } else {
+            if (res2.data.code != null) {
+              wx.showToast({
+                title: '服务正在失去联系，请稍后',
+                icon: 'none',
+                duration: 2000
+              })
+            } else {
+              wx.showToast({
+                title: '取消收藏成功',
+                icon: 'none',
+                duration: 2000
+              })
+              this.detailData.isCollect = 0;
+            }
+          }
+        } else {
+          const res2 = await this.$http.get(`${api}`, {
+            act: "post.collect.add",
+            t: this.t,
+            postId: this.id
+          })
+          if (res2.data.code == 30002) {
+            wx.showToast({
+              title: '已经收藏了',
+              icon: 'none',
+              duration: 2000
+            })
+          } else {
+            if (res2.data.code != null) {
+              wx.showToast({
+                title: '服务正在失去联系，请稍后',
+                icon: 'none',
+                duration: 2000
+              })
+            } else {
+              wx.showToast({
+                title: '收藏成功',
+                icon: 'none',
+                duration: 2000
+              })
+              this.detailData.isCollect = 1;
+            }
+          }
+        }
+
+
+      },
       previewImg(index) {
         const urlList = []
         for (var i = 0; i < this.detailData.imgList.length; i++) {
@@ -172,7 +245,8 @@
           current: this.detailData.imgList[index].url, // 当前显示图片的http链接
           urls: urlList // 需要预览的图片http链接列表
         })
-      },
+      }
+      ,
       getSearchTypeActionSheet() {
         var that = this
         var itemList = ['按时间正序', '按时间倒序']
@@ -192,7 +266,8 @@
 
           }
         })
-      },
+      }
+      ,
       navigateToReply(e) {
         var replyId = e.currentTarget.dataset.replyid
         var postId = e.currentTarget.dataset.postid
@@ -202,7 +277,8 @@
         wx.navigateTo({
           url: `../reply/main?replyId=${replyId}&postId=${postId}&anonymous=${anonymous}&postUserId=${postUserId}`
         })
-      },
+      }
+      ,
       onScroll: debounceOnScroll(),
       async getPostData() {
         wx.showLoading({
@@ -210,13 +286,14 @@
         })
         const res = await this.$http.get(`${api}`, {
           act: 'post.detail',
-          postId: this.id
+          postId: this.id,
+          t: this.t
         })
         this.detailData = res.data
-
         wx.hideLoading()
 
-      },
+      }
+      ,
       async getReplyData() {
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
@@ -231,7 +308,8 @@
         }
         this.currentReplies = res2.data.data
 
-      },
+      }
+      ,
       async collect() {
         const accesstoken = wx.getStorageSync('accesstoken')
         const topic_id = this.id
@@ -264,10 +342,12 @@
           }
           this.detailData.is_collect = true
         }
-      },
+      }
+      ,
       goBottom() {
         this.top = this.currentReplies.length * 1000
-      },
+      }
+      ,
       async getMore() {
         wx.showLoading({
           title: '加载中'
@@ -287,12 +367,14 @@
         this.currentReplies = [...this.currentReplies, ...res2.data.data]
 
         wx.hideLoading()
-      },
+      }
+      ,
       backHome: function () {
         wx.reLaunch({
           url: '/pages/index/main'
         })
-      },
+      }
+      ,
       async upOrCancel(e) {
         // / todo 防抖
         // console.log(e);
@@ -339,7 +421,8 @@
             duration: 2000
           })
         }
-      },
+      }
+      ,
       showReplyModal(e) {
         var userId = wx.getStorageSync('userId')
         var userName = e.currentTarget.dataset.username
@@ -358,7 +441,8 @@
         this.replyId = replyId
         this.replyUserName = userName
         this.sendVisible = true
-      },
+      }
+      ,
       replySuccess() {
         this.closeModal()
         var that = this;
@@ -370,7 +454,8 @@
         })
         this.pageNum = 0
         that.getReplyData()
-      },
+      }
+      ,
       closeModal() {
         this.sendVisible = false
       }
@@ -383,7 +468,8 @@
       }
       console.log('postId=' + this.id)
       console.log(this.isShare)
-    },
+    }
+    ,
     onShow() {
       this.pageNum = 0
       var that = this;
@@ -417,7 +503,8 @@
         replySearchType: 0, //回帖的排序规则，默认正序
         requestAction: 'reply.list',
         loginVisible: false,
-        isShare: 0
+        isShare: 0,
+        t: 0
       }
     }
   }
@@ -689,6 +776,7 @@
       width: 50rpx;
     }
   }
+
   .d-back-home {
     position: fixed;
     width: 96rpx;
