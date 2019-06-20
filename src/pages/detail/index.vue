@@ -174,11 +174,9 @@
     },
     methods: {
       async doOrUndoCollect() {
-        console.log(this.detailData.isCollect + "---")
-
-        if (this.detailData.isCollect == 1) {
+        if (this.detailData.isCollection == 1) {
           const res2 = await this.$http.get(`${api}`, {
-            act: "post.collect.delete",
+            act: "post.collection.delete",
             t: this.t,
             postId: this.id
           })
@@ -201,12 +199,12 @@
                 icon: 'none',
                 duration: 2000
               })
-              this.detailData.isCollect = 0;
+              this.detailData.isCollection = 0;
             }
           }
         } else {
           const res2 = await this.$http.get(`${api}`, {
-            act: "post.collect.add",
+            act: "post.collection.add",
             t: this.t,
             postId: this.id
           })
@@ -229,7 +227,7 @@
                 icon: 'none',
                 duration: 2000
               })
-              this.detailData.isCollect = 1;
+              this.detailData.isCollection = 1;
             }
           }
         }
