@@ -4,7 +4,7 @@
 
     <div>
       <div class='notice' v-for='item in formatNoticeList' :key='item.id' :data-id='item.id'>
-        <div class='head'>
+        <div v-if="item.type!=2" class='head'>
           <img class='head-img' :src='item.fromUserAvatarImgUrl'
                @click.stop='goAuthorPage'>
           <div class='info'>

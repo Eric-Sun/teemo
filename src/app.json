@@ -7,7 +7,9 @@
     "pages/me/main",
     "pages/publish/main",
     "pages/user/main",
-    "pages/reply/main"
+    "pages/reply/main",
+    "pages/collection/main"
+
   ],
   "window": {
     "backgroundTextStyle": "light",
