@@ -1,5 +1,5 @@
 <template>
-  <div class='container' >
+  <div class='container'>
     <div class='head'>
       <img v-if="item.anonymous==0" class='head-img' :src='item.userAvatarUrl'
            @click.stop='goAuthorPage' :data-userid="item.userId">
@@ -18,13 +18,14 @@
     </div>
     <div class='body' @click.stop="goDetail($event)">
       <div class="title">{{item.title}}</div>
-      <pre>{{formatContent}}</pre>
+      <pre v-if="item.isContentLong==0">{{formatContent}}</pre>
+      <pre v-if="item.isContentLong==1">{{formatContent}}<span>查看全部</span></pre>
       <div class="imgs" v-for="(img,index) in item.imgList">
         <img class="img" :src="img.url" @click.stop="previewImg(index)">
       </div>
     </div>
-    <div class='foot' v-if='!hidden'>
-      <div class="reply-items">
+    <div class='foot'>
+      <div class="reply-items" @click.stop="goDetail($event)">
         <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
         <div class="reply-count">{{item.replyCount}}</div>
       </div>
@@ -238,6 +239,10 @@
         text-justify: inter-ideograph;
         font-weight: normal;
         font-size: $content-font-size;
+
+        & > span {
+          color: #5355ff;
+        }
       }
 
       .title {
@@ -275,10 +280,11 @@
         width: 45rpx;
         margin-right: 10rpx;
         background-size: 35rpx 35rpx;
-        background-repeat:no-repeat;
+        background-repeat: no-repeat;
         background-image: url(../../static/share.png);
-        border:none;
+        border: none;
       }
+
       button::after {
         border: none;
       }

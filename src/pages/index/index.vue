@@ -94,8 +94,8 @@
               act: 'post.list',
               t: that.t,
               barId: `${barId}`,
-              pageNum: page,
-              size: 10,
+              pageNum: this.page,
+              size: 5,
               type: type
             })
         wx.hideLoading()
