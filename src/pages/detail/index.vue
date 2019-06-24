@@ -109,11 +109,18 @@
       </scroll-view>
     </div>
     <div class="controller">
-      <div class="group1">
+      <div class="pagination">
+        <div>
+          <img class="left-arrow" src="../../../static/left-arrow.png"/>
+        </div>
+        <div class="pagination-info">{{pageNum}}/{{culculatePageNum}}页</div>
+        <div>
+          <img class="right-arrow" src="../../../static/right-arrow.png"/>
+        </div>
+      </div>
+      <div class="actions">
         <img class="comment" @click="showReplyModal" src="../../../static/comment.png"/>
         <img class="praise" @click="doOrUndoCollect" src="../../../static/praise.png"/>
-      </div>
-      <div class="">
         <img class="share" src="../../../static/share.png"/>
       </div>
     </div>
@@ -152,6 +159,9 @@
       this.getReplyData()
     },
     computed: {
+      culculatePageNum() {
+        return Math.floor(this.level1ReplySize / reply_size_per_page) + 1;
+      },
       formatCreateAt() {
         return passTime(this.detailData.createtime)
       },
@@ -304,6 +314,7 @@
           this.pageNum++
         }
         this.currentReplies = res2.data.data
+        this.level1ReplySize = res2.data.level1ReplySize
 
       }
       ,
@@ -504,7 +515,8 @@
         requestAction: 'reply.list',
         loginVisible: false,
         isShare: 0,
-        t: 0
+        t: 0,
+        level1ReplySize: 0
       }
     }
   }
@@ -752,29 +764,56 @@
     display: flex;
     justify-content: space-between;
 
-    .group1 {
+    .pagination {
       display: flex;
-      margin-right: 20rpx;
+      flex-direction: row;
+      margin-top: 20rpx;
+      margin-left: 20rpx;
+      /*justify-content: space-around;*/
+      .left-arrow {
+        height: 50rpx;
+        width: 50rpx;
+        margin-right: 20rpx;
+      }
+
+      .right-arrow {
+        height: 50rpx;
+        width: 50rpx;
+        margin-left: 20rpx;
+      }
+
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: row;
+      margin-right: 50rpx;
+      margin-top: 20rpx;
 
       .comment {
         height: 50rpx;
         width: 50rpx;
-        margin: 25rpx;
+        margin-right: 25rpx;
       }
 
       .praise {
         height: 50rpx;
         width: 50rpx;
-        margin: 25rpx;
+        margin-right: 20rpx;
+      }
+
+      .share {
+        height: 50rpx;
+        width: 50rpx;
       }
 
     }
 
-    .share {
-      margin: 25rpx;
-      height: 50rpx;
-      width: 50rpx;
-    }
+  }
+
+  .share {
+
+
   }
 
   .d-back-home {
