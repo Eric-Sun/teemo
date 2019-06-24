@@ -99,7 +99,7 @@
               <div class="reply-divide"></div>
             </div>
           </div>
-          <div v-if="canGetMoreReply" class="get-more-tips" @click.stop="getMore">
+          <div v-if="canGetMoreReply" class="get-more-tips">
             获取更多评论
           </div>
           <div v-if="!canGetMoreReply" class="get-more-tips">
@@ -122,7 +122,7 @@
 
 <script>
   import login from '../../components/login'
-  import {api} from '../../const'
+  import {api, reply_size_per_page} from '../../const'
   import {passTime, debounce} from '../../utils'
   import sendReply from '../../components/sendReply'
   import {checkT} from '../../utils/net'
@@ -296,10 +296,9 @@
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: this.pageNum,
-          size: 10,
           postId: this.id
         })
-        if (res2.data.data.length < 10) {
+        if (res2.data.data.length < reply_size_per_page) {
           this.canGetMoreReply = false
         } else {
           this.pageNum++
@@ -347,13 +346,16 @@
       }
       ,
       async getMore() {
+        console.log(this.canGetMoreReply)
+        if (!this.canGetMoreReply) {
+          return;
+        }
         wx.showLoading({
           title: '加载中'
         })
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: this.pageNum,
-          size: 10,
           postId: this.id
         })
         console.log('get more size=' + res2.data.data.length)
