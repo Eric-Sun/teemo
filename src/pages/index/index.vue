@@ -46,19 +46,11 @@
       card,
       login
     },
-
     onShow() {
-      var t = wx.getStorageSync('t')
-      var that = this
-      checkT(t,
-        function () {
-          that.visible = true
-        },
-        function () {
-          that.t = wx.getStorageSync('t')
-          that.getData('story', 0)
-        }
-      );
+      this.init();
+    },
+    onload() {
+      this.init();
     },
     onShareAppMessage: function () {
       return {
@@ -68,15 +60,29 @@
       }
     },
     methods: {
+      init() {
+        var t = wx.getStorageSync('t')
+        var that = this
+        checkT(t,
+          function () {
+            that.visible = true
+          },
+          function () {
+            that.t = wx.getStorageSync('t')
+            that.getData('story', 0)
+            that.getData('diary', 0);
+          }
+        );
+      },
       closeModalEvent() {
         this.visible = false
         this.t = wx.getStorageSync('t')
         this.getData('story', 0)
       },
 
-     
+
       async getData(tab, page) {
-        var that =this;
+        var that = this;
 
         var type = -1
         if (tab == 'story') {
