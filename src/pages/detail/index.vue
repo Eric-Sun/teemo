@@ -25,10 +25,10 @@
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
         </div>
-        <div class='content'>
+        <div v-if="includePostContent==1" class='content'>
           {{detailData.content}}
         </div>
-        <div class="imgs" v-for="(img,imgIndex) in detailData.imgList">
+        <div v-if="includePostContent==1" class="imgs" v-for="(img,imgIndex) in detailData.imgList">
           <img class="img" :src="img.url" @click.stop="previewImg(imgIndex)">
         </div>
 
@@ -111,11 +111,11 @@
     <div class="controller">
       <div class="pagination">
         <div>
-          <img class="left-arrow" src="../../../static/left-arrow.png"/>
+          <img class="left-arrow" src="../../../static/left-arrow.png" @click.stop="backPage()"/>
         </div>
         <div class="pagination-info">{{pageNum}}/{{culculatePageNum}}页</div>
         <div>
-          <img class="right-arrow" src="../../../static/right-arrow.png"/>
+          <img class="right-arrow" src="../../../static/right-arrow.png" @click.stop="goPage()"/>
         </div>
       </div>
       <div class="actions">
@@ -183,6 +183,30 @@
 
     },
     methods: {
+      // 点击左箭头，往前退一个页面
+      backPage() {
+        if (this.pageNum == 1) {
+          return;
+        } else if (this.pageNum == 2) {
+          this.pageNum = this.pageNum - 2
+          this.includePostContent = 1;
+          this.getReplyData();
+        } else {
+          this.pageNum = this.pageNum - 2
+          this.getReplyData();
+        }
+      },
+      // 点击右箭头，往前进一个页面
+      goPage() {
+        if (this.pageNum == this.culculatePageNum) {
+          return;
+        } else if (this.pageNum == 1) {
+          this.includePostContent = 0;
+          this.getReplyData();
+        } else {
+          this.getReplyData();
+        }
+      },
       async doOrUndoCollect() {
         if (this.detailData.isCollection == 1) {
           const res2 = await this.$http.get(`${api}`, {
@@ -309,7 +333,12 @@
           postId: this.id
         })
         if (res2.data.data.length < reply_size_per_page) {
+          // console.log(this.canGetMoreReply)
+          if(this.canGetMoreReply!=false){
+            this.pageNum++
+          }
           this.canGetMoreReply = false
+          // console.log(this.pageNum)
         } else {
           this.pageNum++
         }
@@ -516,7 +545,8 @@
         loginVisible: false,
         isShare: 0,
         t: 0,
-        level1ReplySize: 0
+        level1ReplySize: 0,
+        includePostContent: 1 // 是否包含post信息，如果不包含说明是大于1的评论页面，包含为1，不包含为0
       }
     }
   }
