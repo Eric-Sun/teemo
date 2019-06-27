@@ -15,13 +15,10 @@
         >
         <div class='info'>
           <span>{{detailData.userName}}</span>
-          <!--          <span class='time'>{{formatCreateAt}}</span>-->
         </div>
       </div>
 
-      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="top" enable-back-to-top='true'
-                   @scrolltolower='getMore'
-      >
+      <scroll-view class='body' scroll-y @scroll='onScroll($event)' :scroll-top="cursor" enable-back-to-top='true'>
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
         </div>
@@ -35,9 +32,6 @@
         <div class='reply'>
           <div class="reply-title">
             <div class="reply-length">评论 {{formatReplies.length}}</div>
-            <div class="change-reply-search-type" @click.stop="getSearchTypeActionSheet">
-              {{replySearchType==0?'按时间正序':'按时间倒序'}}
-            </div>
           </div>
 
           <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
@@ -84,9 +78,6 @@
               <img class='up-png' src="/static/go-bottom.png" mode='widthFix' @click.stop="goBottom">
 
               <div class="reply-foot">
-                <!--                <div class="time">-->
-                <!--                  {{formatCreateAt}}-->
-                <!--                </div>-->
                 <div class="action">
                   <img class="item"
                        :data-username="item.userName"
@@ -99,12 +90,6 @@
               <div class="reply-divide"></div>
             </div>
           </div>
-          <div v-if="canGetMoreReply" class="get-more-tips">
-            获取更多评论
-          </div>
-          <div v-if="!canGetMoreReply" class="get-more-tips">
-            已经没有更多评论了
-          </div>
         </div>
       </scroll-view>
     </div>
@@ -113,7 +98,7 @@
         <div>
           <img class="left-arrow" src="../../../static/left-arrow.png" @click.stop="backPage()"/>
         </div>
-        <div class="pagination-info">{{pageNum}}/{{culculatePageNum}}页</div>
+        <div class="pagination-info">{{pageNum+1}}/{{culculatePageNum}}页</div>
         <div>
           <img class="right-arrow" src="../../../static/right-arrow.png" @click.stop="goPage()"/>
         </div>
@@ -136,13 +121,22 @@
 
 
   const debounceOnScroll = () => debounce(function (e) {
-    this.top = e.target.scrollTop
-
+    this.cursor = e.target.scrollTop
   })
   export default {
     components: {
       sendReply,
       login
+    },
+    onUnload() {
+      console.log("cursor=" + this.cursor + " pageNum=" + this.pageNum)
+      this.$http.get(`${api}`, {
+        act: 'post.updateCursor',
+        postId: this.id,
+        pageNum: this.pageNum,
+        t: this.t,
+        cursor: this.cursor
+      })
     },
     mounted() {
 
@@ -156,7 +150,7 @@
       );
       this.t = wx.getStorageSync("t")
       this.getPostData()
-      this.getReplyData()
+      this.getReplyData(-1)
     },
     computed: {
       culculatePageNum() {
@@ -185,27 +179,27 @@
     methods: {
       // 点击左箭头，往前退一个页面
       backPage() {
-        if (this.pageNum == 1) {
+        if (this.pageNum == 0) {
           return;
-        } else if (this.pageNum == 2) {
-          this.pageNum = this.pageNum - 2
+        } else if (this.pageNum == 1) {
+          this.pageNum = this.pageNum - 1
           this.includePostContent = 1;
-          this.getReplyData();
+          this.getReplyData(this.pageNum);
         } else {
-          this.pageNum = this.pageNum - 2
-          this.getReplyData();
+          this.pageNum = this.pageNum - 1
+          this.getReplyData(this.pageNum);
         }
       },
       // 点击右箭头，往前进一个页面
       goPage() {
         if (this.pageNum == this.culculatePageNum) {
           return;
-        } else if (this.pageNum == 1) {
+        } else if (this.pageNum == 0) {
           this.includePostContent = 0;
-          this.getReplyData();
-        } else {
-          this.getReplyData();
         }
+        this.pageNum++;
+        this.getReplyData(this.pageNum);
+
       },
       async doOrUndoCollect() {
         if (this.detailData.isCollection == 1) {
@@ -278,27 +272,27 @@
           urls: urlList // 需要预览的图片http链接列表
         })
       }
-      ,
-      getSearchTypeActionSheet() {
-        var that = this
-        var itemList = ['按时间正序', '按时间倒序']
-
-        wx.showActionSheet({
-          itemList: itemList,
-          success: function (res) {
-            if (that.replySearchType != res.tapIndex) {
-              that.replySearchType = res.tapIndex
-              if (that.replySearchType == 0) {
-                that.requestAction = 'reply.list'
-              } else {
-                that.requestAction = 'reply.reverseList'
-              }
-              that.getReplyData()
-            }
-
-          }
-        })
-      }
+      // ,
+      // getSearchTypeActionSheet() {
+      //   var that = this
+      //   var itemList = ['按时间正序', '按时间倒序']
+      //
+      //   wx.showActionSheet({
+      //     itemList: itemList,
+      //     success: function (res) {
+      //       if (that.replySearchType != res.tapIndex) {
+      //         that.replySearchType = res.tapIndex
+      //         if (that.replySearchType == 0) {
+      //           that.requestAction = 'reply.list'
+      //         } else {
+      //           that.requestAction = 'reply.reverseList'
+      //         }
+      //         that.getReplyData()
+      //       }
+      //
+      //     }
+      //   })
+      // }
       ,
       navigateToReply(e) {
         var replyId = e.currentTarget.dataset.replyid
@@ -322,29 +316,29 @@
           t: this.t
         })
         this.detailData = res.data
+        this.level1ReplySize = res.data.level1ReplySize
         wx.hideLoading()
-
       }
       ,
-      async getReplyData() {
+      /**
+       * pageNum==-1的时候为初始化
+       * pageNum其他的时候是强行跳转
+       * @param type
+       * @param pageNum
+       * @returns {Promise<void>}
+       */
+      async getReplyData(pageNum) {
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
-          pageNum: this.pageNum,
-          postId: this.id
+          pageNum: pageNum, //当等于-1的是从cursor位置读取相关的pageNum，当不等于-1的时候则强行获取该pageNum的数据
+          postId: this.id,
+          t: this.t
         })
-        if (res2.data.data.length < reply_size_per_page) {
-          // console.log(this.canGetMoreReply)
-          if(this.canGetMoreReply!=false){
-            this.pageNum++
-          }
-          this.canGetMoreReply = false
-          // console.log(this.pageNum)
-        } else {
-          this.pageNum++
-        }
+        this.pageNum = pageNum;
         this.currentReplies = res2.data.data
-        this.level1ReplySize = res2.data.level1ReplySize
-
+        this.cursor = res2.data.cursorInfo.cursor
+        this.pageNum = res2.data.cursorInfo.pageNum;
+        console.log("cursor=" + this.cursor + "  pageNum=" + this.pageNum)
       }
       ,
       async collect() {
@@ -383,32 +377,7 @@
       ,
       goBottom() {
         this.top = this.currentReplies.length * 1000
-      }
-      ,
-      async getMore() {
-        console.log(this.canGetMoreReply)
-        if (!this.canGetMoreReply) {
-          return;
-        }
-        wx.showLoading({
-          title: '加载中'
-        })
-        const res2 = await this.$http.get(`${api}`, {
-          act: this.requestAction,
-          pageNum: this.pageNum,
-          postId: this.id
-        })
-        console.log('get more size=' + res2.data.data.length)
-        if (res2.data.data.length < 10) {
-          this.canGetMoreReply = false
-        } else {
-          this.pageNum++
-        }
-        this.currentReplies = [...this.currentReplies, ...res2.data.data]
-
-        wx.hideLoading()
-      }
-      ,
+      },
       backHome: function () {
         wx.reLaunch({
           url: '/pages/index/main'
@@ -485,15 +454,13 @@
       ,
       replySuccess() {
         this.closeModal()
-        var that = this;
         wx.showToast({
           title: '评论成功',
           icon: 'none',
           duration: 1500
 
         })
-        this.pageNum = 0
-        that.getReplyData()
+        this.getReplyData(this.pageNum)
       }
       ,
       closeModal() {
@@ -506,8 +473,6 @@
       if (this.$root.$mp.query.share == 1) {
         this.isShare = 1;
       }
-      console.log('postId=' + this.id)
-      console.log(this.isShare)
     }
     ,
     onShow() {
@@ -532,21 +497,21 @@
         sendVisible: false,
         id: '',
         replyId: '',
-        top: 0,
         timer: null,
         replyUserName: '',
         isPostUserId: false, //默认为不相同
         postAnonymous: 0,
         bottom: 0,
-        pageNum: 0,
-        canGetMoreReply: true,
+        pageNum: 0,  //为当前的页码，从0开始
+        // canGetMoreReply: true,
         replySearchType: 0, //回帖的排序规则，默认正序
         requestAction: 'reply.list',
         loginVisible: false,
         isShare: 0,
         t: 0,
         level1ReplySize: 0,
-        includePostContent: 1 // 是否包含post信息，如果不包含说明是大于1的评论页面，包含为1，不包含为0
+        includePostContent: 1, // 是否包含post信息，如果不包含说明是大于1的评论页面，包含为1，不包含为0
+        cursor: 0
       }
     }
   }
