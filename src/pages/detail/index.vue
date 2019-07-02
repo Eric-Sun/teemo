@@ -22,9 +22,7 @@
         <div class='title'>
           <p class='big'>{{detailData.title}}</p>
         </div>
-        <div v-if="includePostContent==1" class='content'>
-          {{detailData.content}}
-        </div>
+        <div v-if="includePostContent==1" class='content'>{{detailData.content}}</div>
         <div v-if="includePostContent==1" class="imgs" v-for="(img,imgIndex) in detailData.imgList">
           <img class="img" :src="img.url" @click.stop="previewImg(imgIndex)">
         </div>
@@ -34,7 +32,7 @@
             <div class="reply-length">评论 {{formatReplies.length}}</div>
           </div>
 
-          <div class='reply-container' v-for='(item,originindex) in formatReplies' :key='item.id' :data-id='item.id'>
+          <div class='reply-container' v-for='(item,originIndex) in formatReplies' :key='item.id' :data-id='item.id'>
             <div class='reply-head'>
               <img v-if="detailData.anonymous==0" class='head-img' :src='item.userAvatarUrl'
                    @click.stop='goAuthorPage'/>
@@ -42,10 +40,14 @@
               />
             </div>
             <div class="reply-info">
-              <span>  {{item.userName}}</span>
-              <div class='reply-content'>
-                {{item.content}}
+              <div class="reply-info-user-info">
+                <div class="reply-info-user-info-fullname">
+                  <span>{{item.userName}} </span>
+                  <span v-if="item.userId==detailData.userId" class="reply-info-user-info-fullname-louzhu">楼主</span>
+                </div>
+                <span class="reply-info-user-info-loushu">{{(pageNum * reply_size_per_page) + 1 + originIndex}}楼</span>
               </div>
+              <div class='reply-content'>{{item.content}}</div>
               <div v-if="item.imgList.length!=0">
                 <img class='reply-imgList' :src="item.imgList[0].url">
               </div>
@@ -60,6 +62,8 @@
 
                     <div class="reply-replyList-content">
                       <span class="reply-replyList-name">{{innerItem.userName}}</span>
+                      <span v-if="innerItem.userId==detailData.userId"
+                            class="reply-info-user-info-fullname-louzhu">楼主</span>
 
                       <span>:{{innerItem.lastReplyId!=item.replyId?
                       '回复@'+innerItem.lastReplyUserName
@@ -75,7 +79,7 @@
                      :data-anonymous="detailData.anonymous">一共{{item.replySize}}条回复
                 </div>
               </div>
-              <img class='up-png' src="/static/go-bottom.png" mode='widthFix' @click.stop="goBottom">
+              <!--              <img class='up-png' src="/static/go-bottom.png" mode='widthFix' @click.stop="goBottom">-->
 
               <div class="reply-foot">
                 <div class="action">
@@ -105,7 +109,9 @@
       </div>
       <div class="actions">
         <img class="comment" @click="showReplyModal" src="../../../static/comment.png"/>
-        <img class="praise" @click="doOrUndoCollect" src="../../../static/praise.png"/>
+        <img v-if="detailData.isCollection==0" class="praise" @click="doOrUndoCollect" src="../../../static/pre-collection.jpg"/>
+        <img v-if="detailData.isCollection==1" class="praise" @click="doOrUndoCollect" src="../../../static/collectioned.png"/>
+
         <img class="share" src="../../../static/share.png"/>
       </div>
     </div>
@@ -129,7 +135,6 @@
       login
     },
     onUnload() {
-      console.log("cursor=" + this.cursor + " pageNum=" + this.pageNum)
       this.$http.get(`${api}`, {
         act: 'post.updateCursor',
         postId: this.id,
@@ -166,6 +171,11 @@
             createtime: passTime(_.createtime)
           }
         })
+      },
+      culBuildingIndex() {
+        return function (originIndex) {
+          return;
+        }
       }
     },
     onShareAppMessage: function () {
@@ -199,12 +209,11 @@
         }
         this.pageNum++;
         this.getReplyData(this.pageNum);
-
       },
       async doOrUndoCollect() {
         if (this.detailData.isCollection == 1) {
           const res2 = await this.$http.get(`${api}`, {
-            act: "post.collection.delete",
+            act: "collection.post.delete",
             t: this.t,
             postId: this.id
           })
@@ -232,7 +241,7 @@
           }
         } else {
           const res2 = await this.$http.get(`${api}`, {
-            act: "post.collection.add",
+            act: "collection.post.add",
             t: this.t,
             postId: this.id
           })
@@ -338,7 +347,8 @@
         this.currentReplies = res2.data.data
         this.cursor = res2.data.cursorInfo.cursor
         this.pageNum = res2.data.cursorInfo.pageNum;
-        console.log("cursor=" + this.cursor + "  pageNum=" + this.pageNum)
+        if (this.pageNum != 0)
+          this.includePostContent = 0;
       }
       ,
       async collect() {
@@ -445,7 +455,6 @@
         if (userId == this.detailData.userId) {
           this.isPostUserId = true
         }
-        console.log('postAnonymous=' + postAnonymous)
         this.postAnonymous = postAnonymous
         this.replyId = replyId
         this.replyUserName = userName
@@ -486,6 +495,10 @@
         function () {
         }
       );
+      this.reply_size_per_page = reply_size_per_page;
+      this.includePostContent = 1;
+      this.detailData = {}
+      this.currentReplies = []
     }
     ,
     data() {
@@ -511,7 +524,8 @@
         t: 0,
         level1ReplySize: 0,
         includePostContent: 1, // 是否包含post信息，如果不包含说明是大于1的评论页面，包含为1，不包含为0
-        cursor: 0
+        cursor: 0,
+        reply_size_per_page: 0
       }
     }
   }
@@ -633,92 +647,120 @@
             display: flex;
             flex-direction: column;
             margin-left: 20rpx;
-            margin-bottom: 20rpx;
+            margin-bottom: 10rpx;
             margin-right: 50rpx;
             width: 100%;
 
-            & > span {
-              /*font-weight: lighter;*/
-              /*color: rgb(245, 245, 239);*/
-              font-size: $reply-content-font-size;
-            }
-
-            .reply-imgList {
-              height: 210rpx;
-              width: 210rpx;
-            }
-
-            .reply-content {
-              width: 100%;
-              white-space: pre-line;
-              text-align: justify;
-              text-justify: inter-ideograph;
-              font-weight: normal;
-              font-size: $content-font-size;
-            }
-
-            .reply-foot {
+            .reply-info-user-info {
               display: flex;
+              flex-direction: row;
               justify-content: space-between;
-              font-size: 25rpx;
-              /*font-weight: lighter;*/
-              margin-right: 10rpx;
-              margin-top: 10rpx;
+              font-size: 30rpx;
 
-              .time {
+              .reply-info-user-info-fullname {
+                deplay: flex;
+                flex-direction: row;
+
+                .reply-info-user-info-fullname-louzhu {
+                  color: red;
+                  border: 1px solid rgba(93, 93, 93, 0.44);
+                  font-size: 25rpx;
+                }
+              }
+
+              .reply-info-user-info-loushu {
                 color: gray;
-                margin-left: 10rpx;
               }
 
-              .action {
-                .item {
-                  height: 35rpx;
-                  width: 35rpx;
-                  /*margin-left: 50rpx;*/
-                }
-              }
-            }
-
-            .reply-divide {
-              border-bottom: 1px solid #ccc;
-              margin-bottom: 10rpx;
-              margin-top: 10rpx;
-              margin-right: 20rpx;
-            }
-
-            .reply-replyList-div {
-              background-color: rgb(245, 245, 239);
-              font-size: $reply-content-font-size;
-              padding: 15rpx;
-
-              .reply-replyList {
-                .reply-replyList-line {
-                  display: flex;
-                  flex-direction: row;
-
-                  .reply-replyList-name {
-                    color: dodgerblue;
-                  }
-
-                  .reply-replyList-content {
-                    width: 100%;
-                    /*white-space: pre-line;*/
-                    text-align: justify;
-                    text-justify: inter-ideograph;
-                    font-size: $reply-content-font-size;
-                    /*font-weight: lighter;*/
-                  }
-
-                }
-              }
-
-              .reply-replyList-tips {
-                display: flex;
-                color: dodgerblue;
+              & > span {
+                /*font-weight: lighter;*/
+                /*color: rgb(245, 245, 239);*/
+                font-size: $reply-content-font-size;
               }
             }
           }
 
+          .reply-imgList {
+            height: 210rpx;
+            width: 210rpx;
+          }
+
+          .reply-content {
+            width: 100%;
+            white-space: pre-line;
+            text-align: justify;
+            text-justify: inter-ideograph;
+            font-weight: normal;
+            margin-top: 10rpx;
+            font-size: $content-font-size;
+          }
+
+          .reply-foot {
+            display: flex;
+            justify-content: space-between;
+            font-size: 25rpx;
+            /*font-weight: lighter;*/
+            margin-right: 10rpx;
+            margin-top: 10rpx;
+
+            .time {
+              color: gray;
+              margin-left: 10rpx;
+            }
+
+            .action {
+              .item {
+                height: 35rpx;
+                width: 35rpx;
+                /*margin-left: 50rpx;*/
+              }
+            }
+          }
+
+          .reply-divide {
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 10rpx;
+            margin-top: 10rpx;
+            margin-right: 20rpx;
+          }
+
+          .reply-replyList-div {
+            background-color: rgb(245, 245, 239);
+            font-size: $reply-content-font-size;
+            padding: 15rpx;
+
+            .reply-replyList {
+              .reply-replyList-line {
+                display: flex;
+                flex-direction: row;
+
+                .reply-replyList-name {
+                  color: dodgerblue;
+                }
+
+                .reply-info-user-info-fullname-louzhu {
+                  color: red;
+                  border: 1px solid rgba(93, 93, 93, 0.44);
+                  font-size: 25rpx;
+                }
+
+                .reply-replyList-content {
+                  width: 100%;
+                  /*white-space: pre-line;*/
+                  text-align: justify;
+                  text-justify: inter-ideograph;
+                  font-size: $reply-content-font-size;
+                  /*font-weight: lighter;*/
+                }
+
+              }
+            }
+
+            .reply-replyList-tips {
+              display: flex;
+              color: dodgerblue;
+            }
+          }
         }
 
       }

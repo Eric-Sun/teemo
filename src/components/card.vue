@@ -10,11 +10,12 @@
 
         <!--        <span class='time'>{{formatCreateAt}}</span>-->
       </div>
-      <span class="top">
+      <span v-if="!hidden" class="top">
               <img class="ellipsis" src="../../static/ellipsis.png"
                    :data-postid="item.postId"
                    @click.stop="loadActions($event)"/>
       </span>
+<!--      <span v-if="hidden" class="top">楼主有新的回复</span>-->
     </div>
     <div class='body' @click.stop="goDetail($event)">
       <div class="title">{{item.title}}</div>
@@ -24,7 +25,7 @@
         <img class="img" :src="img.url" @click.stop="previewImg(index)">
       </div>
     </div>
-    <div class='foot'>
+    <div v-if="!hidden" class='foot'>
       <div class="reply-items" @click.stop="goDetail($event)">
         <img class="reply-img" @click="showReplyModal" src="../../static/comment.png"/>
         <div class="reply-count">{{item.replyCount}}</div>
@@ -239,6 +240,7 @@
         text-justify: inter-ideograph;
         font-weight: normal;
         font-size: $content-font-size;
+        font-family: SimSun;
 
         & > span {
           color: #5355ff;

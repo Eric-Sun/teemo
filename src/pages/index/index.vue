@@ -9,7 +9,7 @@
     </div>
     <div class="containers" :animation='animation'>
       <div v-for='(listItem,listIndex) in list' :key='listIndex'>
-        <scroll-view scroll-y class='scroll-container' @scrolltolower='getMore'>
+        <scroll-view scroll-y class='scroll-container' @scrolltolower='getMore' :scroll-top="cursor">
           <div v-for='item in cardData[listItem]' :key='item.id'>
             <card :item='item'></card>
           </div>
@@ -38,7 +38,8 @@
         isLoading: false,
         list: ['story', 'diary'],
         animation: {},
-        visible: false
+        visible: false,
+        cursor: 0,
       }
     },
 
@@ -73,6 +74,8 @@
             that.getData('diary', 0);
           }
         );
+        this.cursor = 0;
+        this.page = 0;
       },
       closeModalEvent() {
         this.visible = false
