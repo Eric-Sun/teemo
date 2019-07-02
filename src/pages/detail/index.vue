@@ -109,8 +109,10 @@
       </div>
       <div class="actions">
         <img class="comment" @click="showReplyModal" src="../../../static/comment.png"/>
-        <img v-if="detailData.isCollection==0" class="praise" @click="doOrUndoCollect" src="../../../static/pre-collection.jpg"/>
-        <img v-if="detailData.isCollection==1" class="praise" @click="doOrUndoCollect" src="../../../static/collectioned.png"/>
+        <img v-if="detailData.isCollection==0" class="praise" @click="doOrUndoCollect"
+             src="../../../static/pre-collection.jpg"/>
+        <img v-if="detailData.isCollection==1" class="praise" @click="doOrUndoCollect"
+             src="../../../static/collectioned.png"/>
 
         <img class="share" src="../../../static/share.png"/>
       </div>
@@ -128,6 +130,7 @@
 
   const debounceOnScroll = () => debounce(function (e) {
     this.cursor = e.target.scrollTop
+    // this.cursor = 0;
   })
   export default {
     components: {
@@ -145,17 +148,6 @@
     },
     mounted() {
 
-      var t = wx.getStorageSync("t")
-      checkT(t,
-        function () {
-          that.loginVisible = true
-        },
-        function () {
-        }
-      );
-      this.t = wx.getStorageSync("t")
-      this.getPostData()
-      this.getReplyData(-1)
     },
     computed: {
       culculatePageNum() {
@@ -345,10 +337,11 @@
         })
         this.pageNum = pageNum;
         this.currentReplies = res2.data.data
-        this.cursor = res2.data.cursorInfo.cursor
         this.pageNum = res2.data.cursorInfo.pageNum;
+        console.log("cursor=" + this.cursor + " pageNum=" + this.pageNum)
         if (this.pageNum != 0)
           this.includePostContent = 0;
+        this.cursorTmp = res2.data.cursorInfo.cursor;
       }
       ,
       async collect() {
@@ -482,11 +475,8 @@
       if (this.$root.$mp.query.share == 1) {
         this.isShare = 1;
       }
-    }
-    ,
-    onShow() {
-      this.pageNum = 0
-      var that = this;
+
+
       var t = wx.getStorageSync("t")
       checkT(t,
         function () {
@@ -495,10 +485,22 @@
         function () {
         }
       );
+      this.t = wx.getStorageSync("t")
+      this.getPostData()
+      this.getReplyData(-1)
+    }
+    ,
+    onShow() {
       this.reply_size_per_page = reply_size_per_page;
       this.includePostContent = 1;
       this.detailData = {}
       this.currentReplies = []
+      var that = this;
+      setTimeout(function () {
+        that.cursor = that.cursorTmp;
+
+      }, 1000)
+
     }
     ,
     data() {
@@ -524,8 +526,9 @@
         t: 0,
         level1ReplySize: 0,
         includePostContent: 1, // 是否包含post信息，如果不包含说明是大于1的评论页面，包含为1，不包含为0
-        cursor: 0,
-        reply_size_per_page: 0
+        cursor: -1,
+        reply_size_per_page: 0,
+        cursorTmp: 0
       }
     }
   }
