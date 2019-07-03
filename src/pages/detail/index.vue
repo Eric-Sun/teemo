@@ -147,7 +147,11 @@
       })
     },
     mounted() {
-
+      var that = this;
+      setTimeout(function () {
+        that.cursor = that.cursorTmp;
+      }, 1000)
+      // this.cursor = this.cursorTmp;
     },
     computed: {
       culculatePageNum() {
@@ -496,12 +500,13 @@
       this.detailData = {}
       this.currentReplies = []
       var that = this;
-      setTimeout(function () {
-        that.cursor = that.cursorTmp;
 
-      }, 1000)
+
+    },
+    onReady() {
 
     }
+
     ,
     data() {
       return {

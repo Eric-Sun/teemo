@@ -15,7 +15,10 @@
                    :data-postid="item.postId"
                    @click.stop="loadActions($event)"/>
       </span>
-<!--      <span v-if="hidden" class="top">楼主有新的回复</span>-->
+      <span v-if="new_notice==0&&hidden" class="top-xin">
+        新
+      </span>
+      <!--      <span v-if="hidden" class="top">楼主有新的回复</span>-->
     </div>
     <div class='body' @click.stop="goDetail($event)">
       <div class="title">{{item.title}}</div>
@@ -47,6 +50,10 @@
         // 个人中心展示帖子隐藏一部分东西的复用
         default: false,
         type: Boolean
+      },
+      new_notice: {
+        default: 1,
+        type: Number
       }
     },
     data: {
@@ -211,6 +218,12 @@
           width: 50rpx;
           height: 75rpx;
         }
+      }
+
+      .top-xin {
+        position: absolute;
+        right: 35rpx;
+        color: red;
       }
     }
 

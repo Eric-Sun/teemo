@@ -6,12 +6,17 @@
       <div class='notice' v-for='item in formatNoticeList' :key='item.id' :data-id='item.id'>
         <div v-if="item.type!=2" class="other-notice">
           <div class='head'>
-            <img class='head-img' :src='item.fromUserAvatarImgUrl'
-                 @click.stop='goAuthorPage'>
-            <div class='info'>
-              <span class="name">{{item.fromUserNickName}}</span>
+            <div class="head-left">
+              <img class='head-img' :src='item.fromUserAvatarImgUrl'
+                   @click.stop='goAuthorPage'>
+              <div class='info'>
+                <span class="name">{{item.fromUserNickName}}</span>
 
-              <span class='time'>{{item.createtime}}</span>
+                <span class='time'>{{item.createtime}}</span>
+              </div>
+            </div>
+            <div v-if="item.status==0" class="head-right">
+              新
             </div>
           </div>
           <div class="body" @click.stop="goPostDetail($event)" :data-postid="item.content.postId">
@@ -37,7 +42,7 @@
           </div>
         </div>
         <div v-if="item.type==2">
-          <card :item='item.content' :hidden="true"></card>
+          <card :item='item.content' :hidden="true" :new_notice="item.status"></card>
         </div>
       </div>
     </div>
@@ -149,26 +154,36 @@
           color: black;
           display: flex;
           /*align-items: center;*/
-          .head-img {
-            border-radius: 45rpx;
-            width: 75rpx;
-            height: 75rpx;
+          justify-content: space-between;
+
+          .head-left {
+
+            .head-img {
+              border-radius: 45rpx;
+              width: 75rpx;
+              height: 75rpx;
+            }
+
+            .info {
+              flex-direction: column;
+              display: flex;
+              margin-left: 26rpx;
+
+              .name {
+                font-weight: bold;
+                font-size: $userName-font-size;
+              }
+
+              .time {
+                font-size: $time-font-size;
+                color: $borderColor;
+              }
+            }
           }
 
-          .info {
-            flex-direction: column;
-            display: flex;
-            margin-left: 26rpx;
-
-            .name {
-              font-weight: bold;
-              font-size: $userName-font-size;
-            }
-
-            .time {
-              font-size: $time-font-size;
-              color: $borderColor;
-            }
+          .head-right {
+            font-size: 35rpx;
+            color: red;
           }
 
           .top {
