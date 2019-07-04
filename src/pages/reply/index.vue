@@ -10,11 +10,9 @@
         <div class='head'>
           <img v-if="postAnonymous==0" class='head-img' :src='reply.userAvatarUrl'
                @click.stop='goAuthorPage'>
-          <img v-if="postAnonymous==1" class='head-img' :src='reply.userAvatarUrl'
-          >
+          <img v-if="postAnonymous==1" class='head-img' :src='reply.userAvatarUrl'>
           <div class='info'>
             <div class="name">{{reply.userName}}</div>
-<!--            <div class='time'>{{formatCreateAt}}</div>-->
             <div class='content'>
               {{reply.content}}
             </div>
@@ -43,9 +41,9 @@
                     <img class="reply-imgList" :src="item.imgList[0].url">
                   </div>
                   <div class="reply-foot">
-<!--                    <div class="time">-->
-<!--                      {{formatCreateAt}}-->
-<!--                    </div>-->
+                    <!--                    <div class="time">-->
+                    <!--                      {{formatCreateAt}}-->
+                    <!--                    </div>-->
                     <div class="action">
                       <img class="item"
                            :data-username="item.userName" :data-replyid='item.replyId'
@@ -196,12 +194,14 @@
 <style lang='scss' scoped>
   .container {
     /*height: 100vh;*/
+    height: 90vh;
+    width: 100vw;
     background-color: rgb(245, 245, 239);
 
     .head {
       background-color: white;
       display: flex;
-      padding-left: 20rpx;
+      padding-left: 10rpx;
       /*align-items: center;*/
       .head-img {
         border-radius: 45rpx;
@@ -213,13 +213,9 @@
         flex-direction: column;
         display: flex;
         margin-left: 26rpx;
-        .name{
-          font-size: $userName-font-size;
-        }
 
-        .time {
-          font-size: $time-font-size;
-          color: $borderColor;
+        .name {
+          font-size: $userName-font-size;
         }
 
         .content {
@@ -228,6 +224,7 @@
           text-justify: inter-ideograph;
           margin-bottom: 20rpx;
           margin-right: 25rpx;
+          width: 590rpx;
           font-size: $content-font-size;
         }
       }
@@ -235,7 +232,6 @@
     }
 
     .body {
-      height: 100vh;
       padding: 15rpx;
       background-color: rgb(245, 245, 239);
 
@@ -250,6 +246,7 @@
 
       .reply {
         background-color: white;
+
         .reply-title {
           font-size: 25rpx;
           margin-bottom: 20rpx;
@@ -278,11 +275,11 @@
             .reply-info {
               display: flex;
               flex-direction: column;
-              margin-top:10rpx;
+              margin-top: 10rpx;
               margin-left: 20rpx;
               margin-right: 50rpx;
               width: 100%;
-              
+
 
               & > span {
                 /*font-weight: lighter;*/
@@ -299,7 +296,8 @@
                 font-size: $reply-content-font-size;
 
               }
-              .reply-imgList{
+
+              .reply-imgList {
                 width: 180rpx;
                 height: 180rpx;
               }

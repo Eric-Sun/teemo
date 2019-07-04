@@ -136,8 +136,8 @@
       },
       async getMore() {
         if (!this.isLoading) {
-          await this.getData(this.tab, this.page + 1)
           this.page += 1
+          await this.getData(this.tab, this.page)
         }
       },
       async onPullDownRefresh() {

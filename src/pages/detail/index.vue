@@ -145,6 +145,8 @@
         t: this.t,
         cursor: this.cursor
       })
+      this.detailData = {}
+      this.currentReplies = []
     },
     mounted() {
       var that = this;
@@ -497,8 +499,7 @@
     onShow() {
       this.reply_size_per_page = reply_size_per_page;
       this.includePostContent = 1;
-      this.detailData = {}
-      this.currentReplies = []
+
       var that = this;
 
 
