@@ -2,10 +2,10 @@
   <div class='container'>
     <login :visible='visible' v-on:modalClose='closeModalEvent'></login>
     <div class='header'>
-      <div :class='{ active: tab==="story" }' @click.stop='changeTab($event)' data-tab='story' :data-offset='0'>故事贴
+      <div :class='{ active: tab==="story" }' data-tab='story' :data-offset='0'>故事贴
       </div>
-      <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记
-      </div>
+<!--      <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记-->
+<!--      </div>-->
     </div>
     <div class="containers" :animation='animation'>
       <div v-for='(listItem,listIndex) in list' :key='listIndex'>
@@ -71,7 +71,7 @@
           function () {
             that.t = wx.getStorageSync('t')
             that.getData('story', 0)
-            that.getData('diary', 0);
+            // that.getData('diary', 0);
           }
         );
         this.cursor = 0;
