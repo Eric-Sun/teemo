@@ -8,7 +8,6 @@
         <div class='list-item' @click.stop='setListFrom($event)'>
           最近话题
         </div>
-
       </div>
       <div>
         <div v-for='item in currentData' :key='item.id' :data-id='item.id'>
