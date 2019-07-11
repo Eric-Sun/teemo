@@ -4,18 +4,21 @@
     <div class='header'>
       <div :class='{ active: tab==="story" }' data-tab='story' :data-offset='0'>故事贴
       </div>
-<!--      <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记-->
-<!--      </div>-->
+      <!--      <div :class='{ active: tab==="diary" }' @click.stop='changeTab($event)' data-tab='diary' :data-offset='1'>一日一记-->
+      <!--      </div>-->
     </div>
     <div class="containers" :animation='animation'>
       <div v-for='(listItem,listIndex) in list' :key='listIndex'>
-        <scroll-view scroll-y class='scroll-container' @scrolltolower='getMore' :scroll-top="cursor">
+        <scroll-view scroll-y class='scroll-container' @scroll='onScroll($event)' @scrolltolower='getMore'
+                     :scroll-top="cursor">
           <div v-for='item in cardData[listItem]' :key='item.id'>
             <card :item='item'></card>
           </div>
         </scroll-view>
       </div>
     </div>
+    <img class='up-png' src="/static/refresh.png" mode='widthFix' @click.stop="refresh">
+
   </div>
 </template>
 
@@ -24,7 +27,13 @@
   import {api, barId} from '../../const'
   import login from '../../components/login'
   import {checkT} from '../../utils/net'
+  import {debounce} from '../../utils'
 
+
+  const debounceOnScroll = () => debounce(function (e) {
+    this.cursor = e.target.scrollTop
+    // this.cursor = 0;
+  })
   export default {
     data() {
       return {
@@ -61,6 +70,11 @@
       }
     },
     methods: {
+      onScroll: debounceOnScroll(),
+      refresh() {
+        this.init();
+        this.cursor = 0;
+      },
       init() {
         var t = wx.getStorageSync('t')
         var that = this
@@ -72,10 +86,11 @@
             that.t = wx.getStorageSync('t')
             that.getData('story', 0)
             // that.getData('diary', 0);
+
           }
         );
-        this.cursor = 0;
-        this.page = 0;
+        that.cursor = 0;
+        that.page = 0;
       },
       closeModalEvent() {
         this.visible = false
@@ -169,6 +184,14 @@
     font-size: 30rpx;
     overflow: hidden;
     width: 100vw;
+
+    .up-png {
+      width: 80rpx;
+      color: red;
+      right: 30rpx;
+      bottom: 166rpx;
+      position: fixed;
+    }
 
     .header {
       display: flex;

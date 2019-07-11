@@ -672,7 +672,7 @@
 
                 .reply-info-user-info-fullname-louzhu {
                   color: red;
-                  border: 1px solid rgba(93, 93, 93, 0.44);
+                  border: 0px solid rgba(93, 93, 93, 0.44);
                   font-size: 25rpx;
                 }
               }
@@ -749,7 +749,7 @@
 
                 .reply-info-user-info-fullname-louzhu {
                   color: red;
-                  border: 1px solid rgba(93, 93, 93, 0.44);
+                  border: 0px solid rgba(93, 93, 93, 0.44);
                   font-size: 25rpx;
                 }
 
