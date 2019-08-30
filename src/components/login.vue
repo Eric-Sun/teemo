@@ -3,7 +3,10 @@
     <div class="container">
       <div style='width:100%;padding-left:30rpx;font-size: 28rpx;margin-top:30rpx;'>1、同意当前小程序获取我的微信头像；</div>
       <div style='width:100%;padding-left:30rpx;font-size: 28rpx;margin-top:30rpx;'>2、同意当前小程序获取我的微信昵称等其他信息；</div>
-      <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" class="save-btn">授权登陆</button>
+      <div class="button-group">
+        <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" class="save-btn">授权登陆</button>
+        <button @click.stop="cancel" class="save-btn">暂不登陆</button>
+      </div>
     </div>
   </div>
 
@@ -24,7 +27,9 @@
       }
     },
     methods: {
-
+      cancel() {
+        this.$emit("modalClose");
+      },
       bindGetUserInfo(e) {
         if (e.mp.detail.userInfo) {
           var that = this
@@ -55,7 +60,8 @@
               })
             }
           })
-        }else{
+        } else {
+          this.$emit("modalClose");
         }
       }
     }
@@ -91,20 +97,24 @@
         margin-top: 10rpx;
       }
 
-      .save-btn,
-      .cancel-btn {
-        width: 690rpx;
-        height: 80rpx;
-        line-height: 80rpx;
-        text-align: center;
-        margin-top: 30rpx;
-        border-radius: 6rpx;
-        box-sizing: border-box;
+      .button-group{
+        display:flex;
+        flex-direction: row;
+        .save-btn,
+        .cancel-btn {
+          margin-left:20rpx;
+          line-height: 80rpx;
+          text-align: center;
+          margin-top: 30rpx;
+          border-radius: 6rpx;
+          box-sizing: border-box;
+        }
       }
 
+
       .save-btn {
-        background-color: #e64340;
-        color: #fff;
+        background-color: red;
+        color: white;
       }
     }
   }

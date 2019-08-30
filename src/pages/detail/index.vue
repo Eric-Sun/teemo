@@ -198,6 +198,12 @@
           this.getReplyData(this.pageNum);
         }
       },
+      closeModalEvent() {
+        this.loginVisible = false
+        this.t = wx.getStorageSync("t")
+        this.getPostData()
+        this.getReplyData(-1)
+      },
       // 点击右箭头，往前进一个页面
       goPage() {
         if (this.pageNum == this.culculatePageNum) {
@@ -319,8 +325,7 @@
         })
         const res = await this.$http.get(`${api}`, {
           act: 'post.detail',
-          postId: this.id,
-          t: this.t
+          postId: this.id
         })
         this.detailData = res.data
         this.level1ReplySize = res.data.level1ReplySize
@@ -338,8 +343,7 @@
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: pageNum, //当等于-1的是从cursor位置读取相关的pageNum，当不等于-1的时候则强行获取该pageNum的数据
-          postId: this.id,
-          t: this.t
+          postId: this.id
         })
         this.pageNum = pageNum;
         this.currentReplies = res2.data.data
@@ -482,18 +486,19 @@
         this.isShare = 1;
       }
 
-
+      var that = this
       var t = wx.getStorageSync("t")
       checkT(t,
         function () {
           that.loginVisible = true
         },
         function () {
+          that.t = wx.getStorageSync("t")
+          that.getPostData()
+          that.getReplyData(-1)
         }
       );
-      this.t = wx.getStorageSync("t")
-      this.getPostData()
-      this.getReplyData(-1)
+   
     }
     ,
     onShow() {

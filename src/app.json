@@ -8,7 +8,8 @@
     "pages/publish/main",
     "pages/user/main",
     "pages/reply/main",
-    "pages/collection/main"
+    "pages/collection/main",
+    "pages/member/main"
 
   ],
   "window": {

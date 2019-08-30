@@ -116,7 +116,6 @@
           this.$http.get(`${api}`,
             {
               act: 'post.list',
-              t: that.t,
               barId: `${barId}`,
               pageNum: this.page,
               size: 5,
