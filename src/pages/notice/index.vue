@@ -105,6 +105,11 @@
           })
         }
       },
+      closeModalEvent() {
+        console.log("fd");
+        this.loginVisible = false
+        this.t = wx.getStorageSync("t")
+      },
       goPostDetail(e) {
         const postId = e.currentTarget.dataset.postid
         wx.navigateTo({

@@ -28,6 +28,7 @@
     },
     methods: {
       cancel() {
+        console.log(111);
         this.$emit("modalClose");
       },
       bindGetUserInfo(e) {

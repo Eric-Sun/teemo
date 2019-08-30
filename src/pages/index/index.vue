@@ -93,6 +93,7 @@
         that.page = 0;
       },
       closeModalEvent() {
+        console.log("2222");
         this.visible = false
         this.t = wx.getStorageSync('t')
         this.getData('story', 0)

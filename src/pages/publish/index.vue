@@ -118,6 +118,11 @@
       changeTab(e) {
         this.tab = e.target.dataset.tab
       },
+      closeModalEvent() {
+        console.log("fdafdas")
+        this.loginVisible = false
+        this.t = wx.getStorageSync("t")
+      },
       async handle() {
         if (this.title.length == 0) {
           wx.showToast({
@@ -189,10 +194,7 @@
         })
 
       }
-      ,
-      closeModalEvent() {
-        this.visible = false
-      }
+
     },
     onShow() {
       var that = this;
