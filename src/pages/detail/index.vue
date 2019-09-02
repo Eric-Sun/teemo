@@ -192,6 +192,9 @@
         } else if (this.pageNum == 1) {
           this.pageNum = this.pageNum - 1
           this.includePostContent = 1;
+          wx.showLoading({
+            title: '加载中'
+          })
           this.getReplyData(this.pageNum);
         } else {
           this.pageNum = this.pageNum - 1
@@ -340,6 +343,9 @@
        * @returns {Promise<void>}
        */
       async getReplyData(pageNum) {
+        wx.showLoading({
+          title: '加载中'
+        })
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: pageNum, //当等于-1的是从cursor位置读取相关的pageNum，当不等于-1的时候则强行获取该pageNum的数据
@@ -351,7 +357,12 @@
         console.log("cursor=" + this.cursor + " pageNum=" + this.pageNum)
         if (this.pageNum != 0)
           this.includePostContent = 0;
-        this.cursorTmp = res2.data.cursorInfo.cursor;
+        if (pageNum == -1)
+          this.cursorTmp = res2.data.cursorInfo.cursor;
+        else {
+          this.cursor = 0;
+        }
+        wx.hideLoading();
       }
       ,
       async collect() {
@@ -498,7 +509,7 @@
           that.getReplyData(-1)
         }
       );
-   
+
     }
     ,
     onShow() {
