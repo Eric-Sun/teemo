@@ -120,6 +120,7 @@
               barId: `${barId}`,
               pageNum: this.page,
               size: 5,
+              t: this.t,
               type: type
             })
         wx.hideLoading()

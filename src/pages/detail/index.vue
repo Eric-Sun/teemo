@@ -328,7 +328,8 @@
         })
         const res = await this.$http.get(`${api}`, {
           act: 'post.detail',
-          postId: this.id
+          postId: this.id,
+          t: this.t
         })
         this.detailData = res.data
         this.level1ReplySize = res.data.level1ReplySize
@@ -349,7 +350,8 @@
         const res2 = await this.$http.get(`${api}`, {
           act: this.requestAction,
           pageNum: pageNum, //当等于-1的是从cursor位置读取相关的pageNum，当不等于-1的时候则强行获取该pageNum的数据
-          postId: this.id
+          postId: this.id,
+          t: this.t
         })
         this.pageNum = pageNum;
         this.currentReplies = res2.data.data
